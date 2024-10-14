@@ -28,6 +28,9 @@
         <activity android:name=".SignUpActivity">
 
         </activity>
+        <activity android:name=".GeneralActivity">
+
+        </activity>
     </application>
 
 </manifest>

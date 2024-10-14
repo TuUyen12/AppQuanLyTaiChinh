@@ -6,16 +6,19 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
+
     <ImageView
         android:id="@+id/icon_app"
         android:layout_width="400dp"
         android:layout_height="400dp"
-        android:layout_marginTop="30dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="68dp"
+        android:src="@drawable/icon_app"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@drawable/icon_app">
+        app:layout_constraintTop_toTopOf="parent">
+        
     </ImageView>
+
     <Button
         android:id="@+id/btn_sign_in"
         android:layout_width="200dp"
