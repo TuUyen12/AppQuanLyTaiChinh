@@ -1,6 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ImageView
+        android:id="@+id/image_sign_up"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/image_sign_up"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name:"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toBottomOf="@id/image_sign_up"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="20dp"
+        android:textSize="25sp">
+    </TextView>
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/tv_username"
+        android:layout_marginLeft="30dp"
+        android:hint="Your Name"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_username"
+        app:layout_constraintRight_toRightOf="parent">
+    </EditText>
+
+    <TextView
+        android:id="@+id/tv_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email:"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toBottomOf="@id/tv_username"
+        android:layout_marginTop="30dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="20dp"
+        android:textSize="25sp">
+    </TextView>
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/tv_password"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="20dp"
+        android:hint="********"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_password">
+    </EditText>
+
+    <EditText
+        android:id="@+id/et_cf_password"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/tv_email"
+        android:layout_marginLeft="30dp"
+        android:hint="Your Email"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_email">
+    </EditText>
+
+    <TextView
+        android:id="@+id/tv_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Password:"
+        android:textSize="25sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_email"></TextView>
+
+    <TextView
+        android:id="@+id/tv_cfpassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Password:"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toBottomOf="@id/tv_password"
+        android:layout_marginTop="30dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="20dp"
+        android:textSize="25sp">
+    </TextView>
+
+    <EditText
+        android:id="@+id/et_cfpassword"
+        android:layout_width="230dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/tv_cfpassword"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="20dp"
+        android:hint="Confirm your Password"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_cfpassword">
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="200dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="70dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="sign up"
+        android:textAllCaps="true"
+        android:textSize="32sp">
+    </Button>
 </androidx.constraintlayout.widget.ConstraintLayout>
