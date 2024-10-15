@@ -1,0 +1,3 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/my_light_primary"/> <!-- Màu nền --><!-- Bo góc, có thể bỏ nếu không cần -->
+</shape>

@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button loginButton;
+    private UserData userData; // Đối tượng UserData để lưu thông tin người dùng
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,20 +55,43 @@ public class SignInActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<com.google.firebase.auth.AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success
                             FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                saveUserData(user);
+                            }
+
                             Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                            // Chuyển hướng đến Home
+                            // Chuyển `UserData` sang `GeneralActivity`
                             Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
+                            intent.putExtra("username", userData.getUsername());
+                            intent.putExtra("email", userData.getEmail());
                             startActivity(intent);
                             finish();
                         } else {
-                            // If sign in fails, display a message to the user.
                             String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error occurred";
                             Toast.makeText(SignInActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
+    }
+
+
+    // Hàm lưu thông tin người dùng từ Firebase xuống UserData
+    private void saveUserData(FirebaseUser firebaseUser) {
+        // Lấy email và username từ FirebaseUser
+        String email = firebaseUser.getEmail();
+        String username = firebaseUser.getDisplayName();  // Firebase có thể không cung cấp username, cần tùy chỉnh nếu không có
+
+        // Nếu username null, gán giá trị mặc định
+        if (username == null || username.isEmpty()) {
+            username = email != null ? email.split("@")[0] : "Unknown User";
+        }
+
+        // Khởi tạo đối tượng UserData và lưu thông tin
+        userData = new UserData(username, "password_placeholder", email); // Password có thể không lưu tại đây
+
+        // Debug thông tin
+        Toast.makeText(this, "UserData saved: " + username + ", " + email, Toast.LENGTH_SHORT).show();
     }
 }

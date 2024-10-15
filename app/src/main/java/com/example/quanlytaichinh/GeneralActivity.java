@@ -23,6 +23,10 @@ public class GeneralActivity extends AppCompatActivity {
         // Hiển thị HomeFragment mặc định khi đăng nhập
         showFragment(new HomeFragment());
 
+        // Nhận dữ liệu từ Intent
+        String username = getIntent().getStringExtra("username");
+        String email = getIntent().getStringExtra("email");
+
         // Thiết lập sự kiện cho từng ImageButton
         ibHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,8 +63,15 @@ public class GeneralActivity extends AppCompatActivity {
         ibSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Tạo đối tượng SettingFragment và truyền dữ liệu
+                SettingFragment settingFragment = new SettingFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                bundle.putString("email", email);
+                settingFragment.setArguments(bundle);
+
                 // Hiển thị Fragment cho Settings
-                showFragment(new SettingFragment());
+                showFragment(settingFragment);
             }
         });
     }
