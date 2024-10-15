@@ -58,8 +58,11 @@ public class SettingFragment extends Fragment {
         // Tạo danh sách các item setting
         List<SettingItem> settingItems = new ArrayList<>();
         //Thêm các item ở đây
-        settingItems.add(new SettingItem("Account", R.mipmap.ic_account1_foreground));
-        settingItems.add(new SettingItem("Privacy", R.mipmap.ic_account1_foreground));
+        settingItems.add(new SettingItem("General Setting", R.mipmap.ic_general_setting_foreground));
+        settingItems.add(new SettingItem("Time Setting", R.mipmap.ic_time_setting_foreground));
+        settingItems.add(new SettingItem("Guiding and Information", R.mipmap.ic_guide_and_info_foreground));
+        settingItems.add(new SettingItem("Language", R.mipmap.ic_language_foreground));
+        settingItems.add(new SettingItem("Feedback", R.mipmap.ic_feedback_foreground));
 
         // Tạo adapter và thiết lập cho ListView
         SettingAdapter adapter = new SettingAdapter(getContext(), settingItems);

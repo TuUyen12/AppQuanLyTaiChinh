@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <ImageView
         android:id="@+id/image_sign_up"
         android:layout_width="0dp"
@@ -15,6 +16,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
+
 
     <TextView
         android:id="@+id/tv_username"
@@ -29,10 +31,11 @@
         android:textSize="25sp">
     </TextView>
 
+
     <EditText
         android:id="@+id/et_username"
         android:layout_width="260dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toRightOf="@id/tv_username"
         android:layout_marginLeft="30dp"
         android:hint="Your Name"
@@ -40,10 +43,11 @@
         app:layout_constraintRight_toRightOf="parent">
     </EditText>
 
+
     <TextView
         android:id="@+id/tv_email"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="Email:"
         android:fontFamily="sans-serif-medium"
         app:layout_constraintTop_toBottomOf="@id/tv_username"
@@ -53,10 +57,11 @@
         android:textSize="25sp">
     </TextView>
 
+
     <EditText
         android:id="@+id/et_password"
         android:layout_width="230dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toRightOf="@id/tv_password"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="20dp"
@@ -65,16 +70,18 @@
         app:layout_constraintBaseline_toBaselineOf="@id/tv_password">
     </EditText>
 
+
     <EditText
         android:id="@+id/et_email"
         android:layout_width="260dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toRightOf="@id/tv_email"
         android:layout_marginLeft="30dp"
         android:hint="Your Email"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@id/tv_email">
     </EditText>
+
 
     <TextView
         android:id="@+id/tv_password"
@@ -88,7 +95,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_email">
 
+
     </TextView>
+
 
     <TextView
         android:id="@+id/tv_cfpassword"
@@ -103,10 +112,11 @@
         android:textSize="25sp">
     </TextView>
 
+
     <EditText
         android:id="@+id/et_cf_password"
         android:layout_width="230dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toRightOf="@id/tv_cfpassword"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="20dp"
@@ -114,6 +124,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBaseline_toBaselineOf="@id/tv_cfpassword">
     </EditText>
+
 
     <Button
         android:id="@+id/btn_sign_up"
