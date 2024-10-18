@@ -14,15 +14,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
 
 public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
-    private FirebaseAnalytics mFirebaseAnalytics; // Thêm FirebaseAnalytics
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private long currentUserId = 22520000; // ID bắt đầu là 22520000
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,77 +39,99 @@ public class SignUpActivity extends AppCompatActivity {
 
         // Khởi tạo Firebase Auth và Firebase Analytics
         auth = FirebaseAuth.getInstance();
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this); // Khởi tạo Firebase Analytics
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        btn_sign_up.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = et_username.getText().toString().trim();
-                String email = et_email.getText().toString().trim();
-                String password = et_password.getText().toString().trim();
-                String confirm_password = et_confirm_password.getText().toString().trim();
+        btn_sign_up.setOnClickListener(view -> {
+            String username = et_username.getText().toString().trim();
+            String email = et_email.getText().toString().trim();
+            String password = et_password.getText().toString().trim();
+            String confirm_password = et_confirm_password.getText().toString().trim();
 
-                // Kiểm tra các trường thông tin
-                if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(SignUpActivity.this, "Vui lòng nhập username!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(SignUpActivity.this, "Vui lòng nhập email!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(SignUpActivity.this, "Vui lòng nhập mật khẩu!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(confirm_password)) {
-                    Toast.makeText(SignUpActivity.this, "Vui lòng nhập lại mật khẩu!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!password.equals(confirm_password)) {
-                    Toast.makeText(SignUpActivity.this, "Mật khẩu không khớp!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Đăng ký người dùng
-                RegisterUser(email, password, username);
+            // Kiểm tra các trường thông tin
+            if (TextUtils.isEmpty(username)) {
+                Toast.makeText(SignUpActivity.this, "Vui lòng nhập username!", Toast.LENGTH_SHORT).show();
+                return;
             }
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(SignUpActivity.this, "Vui lòng nhập email!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(SignUpActivity.this, "Vui lòng nhập mật khẩu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (TextUtils.isEmpty(confirm_password)) {
+                Toast.makeText(SignUpActivity.this, "Vui lòng nhập lại mật khẩu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!password.equals(confirm_password)) {
+                Toast.makeText(SignUpActivity.this, "Mật khẩu không khớp!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Đăng ký người dùng
+            RegisterUser(email, password, username);
         });
     }
 
     private void RegisterUser(String email, String password, String username) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser user = auth.getCurrentUser();
-                SaveUserData(user.getUid(), username, email, password);
-                Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-
-                // Ghi lại sự kiện đăng ký thành công
-                Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.METHOD, "email_password");
-                mFirebaseAnalytics.logEvent("user_registration_success", bundle); // Ghi lại sự kiện
-
-                finish();
-                Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-                startActivity(intent);
-            } else {
-                Toast.makeText(SignUpActivity.this, "Đăng ký thất bại!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Đăng ký thành công
+                        FirebaseUser user = auth.getCurrentUser();
+                        SaveUserData(username, email);
+                        Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        String errorMessage = task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định";
+                        Toast.makeText(SignUpActivity.this, "Đăng ký thất bại: " + errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
-    private void SaveUserData(String userId, String username, String email, String password) {
+    private void SaveUserData(String username, String email) {
         FirebaseDatabase firebasedatabase = FirebaseDatabase.getInstance();
         DatabaseReference databasereference = firebasedatabase.getReference("users");
 
-        UserData user = new UserData(username, password, email); // Đảm bảo rằng username được sử dụng ở đây
+        // Kiểm tra ID người dùng hiện tại
+        databasereference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                while (snapshot.hasChild(String.valueOf(currentUserId))) {
+                    currentUserId++; // Tăng ID cho đến khi tìm được ID chưa sử dụng
+                }
 
-        databasereference.child(userId).setValue(user).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(SignUpActivity.this, "Dữ liệu người dùng đã được lưu thành công!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(SignUpActivity.this, "Lưu dữ liệu người dùng thất bại.", Toast.LENGTH_SHORT).show();
+                // Tạo ID người dùng mới
+                String customUserId = generateCustomUserId();
+
+                // Khởi tạo đối tượng UserData với username và email
+                UserData user = new UserData(username, email);
+
+                // Lưu dữ liệu người dùng vào Firebase với ID tự tạo
+                databasereference.child(customUserId).setValue(user).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(SignUpActivity.this, "Dữ liệu người dùng đã được lưu thành công với ID: " + customUserId, Toast.LENGTH_SHORT).show();
+                        // Tăng ID để chuẩn bị cho người dùng tiếp theo
+                        currentUserId++;
+                    } else {
+                        Toast.makeText(SignUpActivity.this, "Lưu dữ liệu người dùng thất bại.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(SignUpActivity.this, "Lỗi khi kiểm tra ID người dùng.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    // Hàm tạo ID người dùng tùy chỉnh (8 chữ số, bắt đầu bằng 2252)
+    private String generateCustomUserId() {
+        return String.valueOf(currentUserId);
+    }
+
 }

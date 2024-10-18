@@ -28,7 +28,8 @@
         <activity android:name=".SignUpActivity">
 
         </activity>
-        <activity android:name=".GeneralActivity">
+        <activity
+            android:name=".GeneralActivity">
 
         </activity>
         <activity android:name=".InfoAccountActivity">

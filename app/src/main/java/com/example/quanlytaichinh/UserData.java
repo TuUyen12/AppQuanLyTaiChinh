@@ -3,13 +3,11 @@ package com.example.quanlytaichinh;
 
 public class UserData {
     public String username;
-    public String password;
     public String email;
 
 
-    public UserData(String username, String password, String email){
+    public UserData(String username, String email){
         this.email = email;
-        this.password = password;
         this.username = username;
     }
 
@@ -21,18 +19,6 @@ public class UserData {
     public String getEmail(){
         return email;
     }
-
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    // Hàm set _ Chỉnh dữ liệu
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     public void setEmail(String email) {
         this.email = email;

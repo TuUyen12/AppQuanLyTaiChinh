@@ -17,7 +17,7 @@ import com.google.android.gms.tasks.Task;
 
 public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    private Button loginButton;
+    private Button loginButton, resetPasswordButton; // Thêm nút reset password
     private UserData userData; // Đối tượng UserData để lưu thông tin người dùng
 
     @Override
@@ -25,73 +25,59 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin_layout);
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        // Find views
         EditText et_email = findViewById(R.id.et_email);
         EditText et_password = findViewById(R.id.et_password);
         loginButton = findViewById(R.id.btn_sign_in);
 
-        // Set up the login button event
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = et_email.getText().toString().trim();
-                String password = et_password.getText().toString().trim();
+        loginButton.setOnClickListener(v -> {
+            String email = et_email.getText().toString().trim();
+            String password = et_password.getText().toString().trim();
 
-                if (!email.isEmpty() && !password.isEmpty()) {
-                    signIn(email, password);
-                } else {
-                    Toast.makeText(SignInActivity.this, "Vui lòng điền email và password", Toast.LENGTH_SHORT).show();
-                }
+            if (!email.isEmpty() && !password.isEmpty()) {
+                signIn(email, password);
+            } else {
+                Toast.makeText(SignInActivity.this, "Vui lòng điền email và password", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<com.google.firebase.auth.AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<com.google.firebase.auth.AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                saveUserData(user);
-                            }
-
-                            Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-
-                            // Chuyển `UserData` sang `GeneralActivity`
-                            Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
-                            intent.putExtra("username", userData.getUsername());
-                            intent.putExtra("email", userData.getEmail());
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error occurred";
-                            Toast.makeText(SignInActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_LONG).show();
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            saveUserData(user);
                         }
+
+                        Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
+                        // Chuyển `UserData` sang `GeneralActivity`
+                        Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
+                        intent.putExtra("username", userData.getUsername());
+                        intent.putExtra("email", userData.getEmail());
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error occurred";
+                        Toast.makeText(SignInActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
-
-    // Hàm lưu thông tin người dùng từ Firebase xuống UserData
     private void saveUserData(FirebaseUser firebaseUser) {
-        // Lấy email và username từ FirebaseUser
         String email = firebaseUser.getEmail();
-        String username = firebaseUser.getDisplayName();  // Firebase có thể không cung cấp username, cần tùy chỉnh nếu không có
+        String username = firebaseUser.getDisplayName();
 
-        // Nếu username null, gán giá trị mặc định
         if (username == null || username.isEmpty()) {
             username = email != null ? email.split("@")[0] : "Unknown User";
         }
 
-        // Khởi tạo đối tượng UserData và lưu thông tin
-        userData = new UserData(username, "password_placeholder", email); // Password có thể không lưu tại đây
+        userData = new UserData(username, email);
 
-        // Debug thông tin
         Toast.makeText(this, "UserData saved: " + username + ", " + email, Toast.LENGTH_SHORT).show();
     }
 }
