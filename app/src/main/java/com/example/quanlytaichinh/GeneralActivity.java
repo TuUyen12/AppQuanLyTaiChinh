@@ -83,4 +83,5 @@ public class GeneralActivity extends AppCompatActivity {
                 .addToBackStack(null) // Thêm vào back stack để người dùng có thể quay lại
                 .commit();
     }
+
 }

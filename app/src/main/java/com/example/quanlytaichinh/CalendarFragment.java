@@ -7,12 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 
 public class CalendarFragment extends Fragment {
@@ -20,7 +25,7 @@ public class CalendarFragment extends Fragment {
 
     CalendarView calendarView;
     ImageButton ibInsert;
-
+    TextView tvShowDay;
 
     // Biến lưu trữ ngày đã chọn
     private int selectedYear = -1;
@@ -34,14 +39,18 @@ public class CalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.calendar_layout, container, false);
 
-
-        // Tham chiếu tới CalendarView
         calendarView = view.findViewById(R.id.calendarView);
-
-
-        // Tham chiếu tới ImageButton
         ibInsert = view.findViewById(R.id.ib_insert);
+        tvShowDay = view.findViewById(R.id.tv_show_day);
 
+        // Lấy ngày hiện tại khi mở app lên
+        Calendar currentDate = Calendar.getInstance();
+        selectedYear = currentDate.get(Calendar.YEAR);
+        selectedMonth = currentDate.get(Calendar.MONTH) + 1; // Tháng bắt đầu từ 0 nên cần cộng 1
+        selectedDay = currentDate.get(Calendar.DAY_OF_MONTH);
+
+        // Hiển thị ngày mặc định lên TextView
+        tvShowDay.setText("Ngày  " + selectedDay + " Tháng " + selectedMonth + " Năm " + selectedYear);
 
         // Thiết lập sự kiện khi nhấn vào ngày trong CalendarView
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -51,7 +60,9 @@ public class CalendarFragment extends Fragment {
                 selectedYear = year;
                 selectedMonth = month + 1;  // Tháng bắt đầu từ 0, nên cần cộng 1
                 selectedDay = dayOfMonth;
-                Toast.makeText(getActivity(), "Ngày đã chọn: " + selectedDay + "/" + selectedMonth + "/" + selectedYear, Toast.LENGTH_SHORT).show();
+
+                // Hiển thị ngày đã chọn lên TextView
+                tvShowDay.setText("Ngày " + selectedDay + " Tháng " + selectedMonth + " Năm " + selectedYear);
             }
         });
 
@@ -82,7 +93,6 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
-
 
         return view;
     }

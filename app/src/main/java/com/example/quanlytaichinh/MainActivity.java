@@ -2,6 +2,7 @@ package com.example.quanlytaichinh;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Chuyển sang Activity khác
+                Intent intent = new Intent(MainActivity.this, GeneralActivity.class);
+                startActivity(intent);
+                // Nếu muốn kết thúc Activity hiện tại, có thể gọi finish()
+                finish();
+            }
+        }, 2000);
         Button btn_sign_in = findViewById(R.id.btn_sign_in);
         btn_sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
