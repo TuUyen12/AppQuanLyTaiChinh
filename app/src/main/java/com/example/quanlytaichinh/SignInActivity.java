@@ -2,9 +2,11 @@ package com.example.quanlytaichinh;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +43,24 @@ public class SignInActivity extends AppCompatActivity {
                 Toast.makeText(SignInActivity.this, "Vui lòng điền email và password", Toast.LENGTH_SHORT).show();
             }
         });
+        ImageButton ib_eye = findViewById(R.id.ib_eye);
+        final boolean[] isPasswordVisible = {false}; // Sử dụng mảng để có thể thay đổi giá trị
+
+        ib_eye.setOnClickListener(v -> {
+            if (isPasswordVisible[0]) {
+                isPasswordVisible[0] = false;
+                ib_eye.setImageResource(R.drawable.hide_with_size);
+                et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else {
+                isPasswordVisible[0] = true;
+                ib_eye.setImageResource(R.drawable.show_with_size);
+                et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            }
+
+            // Đặt con trỏ ở cuối văn bản
+            et_password.setSelection(et_password.getText().length());
+        });
+
 
     }
 

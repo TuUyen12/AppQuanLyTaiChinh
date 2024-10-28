@@ -7,15 +7,20 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        maven("https://jitpack.io")
         mavenCentral()
         gradlePluginPortal()
     }
+    plugins {
+        id("com.android.application") version "7.0.4" apply false // Thay đổi phiên bản nếu cần
+        id("com.google.gms.google-services") version "4.4.2" apply false
+    }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io") // Thêm JitPack repository nếu cần
     }
 }
 

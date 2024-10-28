@@ -2,10 +2,12 @@ package com.example.quanlytaichinh;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,8 +36,44 @@ public class SignUpActivity extends AppCompatActivity {
         EditText et_username = findViewById(R.id.et_username);
         EditText et_email = findViewById(R.id.et_email);
         EditText et_password = findViewById(R.id.et_password);
-        EditText et_confirm_password = findViewById(R.id.et_cf_password);
+        EditText et_confirm_password = findViewById(R.id.et_confirm_password);
         Button btn_sign_up = findViewById(R.id.btn_sign_up);
+
+        //Giao diện
+        ImageButton ib_eye = findViewById(R.id.ib_eye);
+        final boolean[] isPasswordVisible = {false}; // Sử dụng mảng để có thể thay đổi giá trị
+
+        ib_eye.setOnClickListener(v -> {
+            if (isPasswordVisible[0]) {
+                isPasswordVisible[0] = false;
+                ib_eye.setImageResource(R.drawable.hide_with_size);
+                et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else {
+                isPasswordVisible[0] = true;
+                ib_eye.setImageResource(R.drawable.show_with_size);
+                et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            }
+
+            // Đặt con trỏ ở cuối văn bản
+            et_password.setSelection(et_password.getText().length());
+        });
+
+        ImageButton ib_eye1 = findViewById(R.id.ib_eye1);
+        final boolean[] isConfirmPasswordVisible = {false}; // Sử dụng mảng để có thể thay đổi giá trị
+        ib_eye1.setOnClickListener(v -> {
+            if (isConfirmPasswordVisible[0]) {
+                isConfirmPasswordVisible[0] = false;
+                ib_eye1.setImageResource(R.drawable.hide_with_size);
+                et_confirm_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else {
+                isConfirmPasswordVisible[0] = true;
+                ib_eye1.setImageResource(R.drawable.show_with_size);
+                et_confirm_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            }
+
+            et_confirm_password.setSelection(et_confirm_password.getText().length());
+        });
+
 
         // Khởi tạo Firebase Auth và Firebase Analytics
         auth = FirebaseAuth.getInstance();
@@ -72,6 +110,7 @@ public class SignUpActivity extends AppCompatActivity {
             // Đăng ký người dùng
             RegisterUser(email, password, username);
         });
+
     }
 
     private void RegisterUser(String email, String password, String username) {
