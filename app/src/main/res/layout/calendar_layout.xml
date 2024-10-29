@@ -41,9 +41,12 @@
         android:id="@+id/ib_insert"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@mipmap/ic_insert1_round"
+        android:src="@drawable/add_with_size"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:contentDescription="Insert"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

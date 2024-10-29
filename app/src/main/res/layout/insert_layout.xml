@@ -60,29 +60,31 @@
     <LinearLayout
         android:id="@+id/linearlayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_financial">
-        <Button
+        <ImageButton
             android:id="@+id/btn_expense"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Expense"
+            android:src="@drawable/expense_with_size"
             android:textSize="25sp"
-            android:background="@color/white">
-        </Button>
-        <Button
+            android:background="@color/my_light_primary"
+            android:contentDescription="expense">
+        </ImageButton>
+        <ImageButton
             android:id="@+id/btn_income"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Income"
+            android:src="@drawable/income_with_size"
             android:textSize="25sp"
-            android:background="@drawable/no_border_button">
-        </Button>
+            android:background="@color/my_light_primary"
+            android:contentDescription="income">
+        </ImageButton>
     </LinearLayout>
     <GridView
         android:id="@+id/grid_view"

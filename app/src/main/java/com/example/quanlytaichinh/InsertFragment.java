@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,24 +59,38 @@ public class InsertFragment extends Fragment {
         // Mặc định hiển thị "Expense"
         tvfinancial.setText("Expense: ");
 
-        // Thiết lập các nút chuyển đổi
-        Button btnIncome = view.findViewById(R.id.btn_income);
-        Button btnExpense = view.findViewById(R.id.btn_expense);
+        // Phần thiết lập nút trong onCreateView
+        ImageButton btnIncome = view.findViewById(R.id.btn_income);
+        ImageButton btnExpense = view.findViewById(R.id.btn_expense);
 
-        btnIncome.setBackgroundColor(Color.CYAN);
+        // Thiết lập hình ảnh mặc định cho nút Expense và Income
+        btnIncome.setImageResource(R.drawable.income1_with_size); // Đặt hình ảnh mặc định cho Income
+        btnExpense.setImageResource(R.drawable.expense_with_size); // Đặt hình ảnh mặc định cho Expense
+
+        // Sự kiện bấm nút Income
         btnIncome.setOnClickListener(v -> {
             insertItems.clear(); // Xóa danh sách hiện tại
             insertItems.addAll(incomeItems); // Thêm danh sách income
             insertAdapter.notifyDataSetChanged(); // Cập nhật GridView
             tvfinancial.setText("Income: "); // Cập nhật TextView hiển thị
+
+            // Cập nhật hình ảnh nút Income và Expense khi Income được chọn
+            btnIncome.setImageResource(R.drawable.income_with_size);
+            btnExpense.setImageResource(R.drawable.expense1_with_size);
         });
 
+        // Sự kiện bấm nút Expense
         btnExpense.setOnClickListener(v -> {
             insertItems.clear(); // Xóa danh sách hiện tại
             insertItems.addAll(expenseItems); // Thêm danh sách expense
             insertAdapter.notifyDataSetChanged(); // Cập nhật GridView
             tvfinancial.setText("Expense: "); // Cập nhật TextView hiển thị
+
+            // Cập nhật hình ảnh nút Income và Expense khi Expense được chọn
+            btnIncome.setImageResource(R.drawable.income1_with_size);
+            btnExpense.setImageResource(R.drawable.expense_with_size);
         });
+
 
         return view;
     }
