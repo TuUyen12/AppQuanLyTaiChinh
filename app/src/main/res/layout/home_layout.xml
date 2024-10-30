@@ -48,7 +48,7 @@
                         android:id="@+id/tv_textbalance"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
-                        android:text="Balance: "
+                        android:text="Total Balance: "
                         android:textSize="25sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -93,32 +93,41 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="Tình hình thu chi"
+                android:layout_weight="0.5"
+                android:text="Expense vs Income"
                 android:layout_marginStart="10dp"
                 android:textSize="20sp"
                 android:textColor="@color/my_light_primary">
             </TextView>
             <Spinner
-                android:id="@+id/spinner_day"
+                android:id="@+id/spinner_duration"
                 android:layout_marginStart="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_weight="0.75">
             </Spinner>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChart"
+                    android:layout_width="300dp"
+                    android:layout_height="150dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true">
+                </com.github.mikephil.charting.charts.BarChart>
+            </RelativeLayout>
+
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="3">
             </com.github.mikephil.charting.charts.PieChart>
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/barChart"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="3">
 
-            </com.github.mikephil.charting.charts.BarChart>
+
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_financial"
@@ -131,25 +140,37 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="0.5"
                 android:layout_marginStart="10dp"
-                android:text="Phân tích chi tiêu"
+                android:text="Expense analysis"
                 android:textSize="20sp"
                 android:textColor="@color/my_light_primary">
             </TextView>
-            <TextView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="từ ngày - đến ngày"
-                android:layout_marginStart="10dp"
-                android:textSize="20sp">
-            </TextView>
+                android:layout_weight="0.75">
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/calendar1_with_size"
+                    android:layout_centerVertical="true">
+
+                </ImageView>
+                <Spinner
+                    android:id="@+id/spinner_year"
+                    android:layout_width="140dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="40dp">
+
+                </Spinner>
+            </RelativeLayout>
+
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChart_financial"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="4">
+                android:layout_weight="5">
             </com.github.mikephil.charting.charts.BarChart>
         </LinearLayout>
 

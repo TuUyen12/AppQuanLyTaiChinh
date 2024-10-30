@@ -12,29 +12,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QuanLyTaiChinh"
         tools:targetApi="31">
+
+        <!-- Chuyển intent-filter từ MainActivity sang GeneralActivity -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.QuanLyTaiChinh">
+            android:name=".GeneralActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignInActivity">
 
-        </activity>
-        <activity android:name=".SignUpActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.QuanLyTaiChinh" />
 
-        </activity>
-        <activity
-            android:name=".GeneralActivity">
+        <activity android:name=".SignInActivity" />
+        <activity android:name=".SignUpActivity" />
+        <activity android:name=".InfoAccountActivity" />
 
-        </activity>
-        <activity android:name=".InfoAccountActivity">
-
-        </activity>
     </application>
-
 </manifest>
