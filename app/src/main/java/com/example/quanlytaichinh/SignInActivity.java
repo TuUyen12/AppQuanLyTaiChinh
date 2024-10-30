@@ -1,6 +1,8 @@
 package com.example.quanlytaichinh;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,12 +25,17 @@ public class SignInActivity extends AppCompatActivity {
     private Button loginButton, resetPasswordButton; // Thêm nút reset password
     private UserData userData; // Đối tượng UserData để lưu thông tin người dùng
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signin_layout);
 
         mAuth = FirebaseAuth.getInstance();
+
+        // Khởi tạo SharedPreferences và Editor để lưu lựa chọn cá nhân hay doanh nghiệp
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
         EditText et_email = findViewById(R.id.et_email);
         EditText et_password = findViewById(R.id.et_password);
@@ -75,12 +83,8 @@ public class SignInActivity extends AppCompatActivity {
 
                         Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                        // Chuyển `UserData` sang `GeneralActivity`
-                        Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
-                        intent.putExtra("username", userData.getUsername());
-                        intent.putExtra("email", userData.getEmail());
-                        startActivity(intent);
-                        finish();
+                        // Bật dialog_account_type để chọn loại tài khoản và lưu vào SharedPreferences
+                        showAccountTypeDialog();
                     } else {
                         String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error occurred";
                         Toast.makeText(SignInActivity.this, "Login failed: " + errorMessage, Toast.LENGTH_LONG).show();
@@ -99,5 +103,38 @@ public class SignInActivity extends AppCompatActivity {
         userData = new UserData(username, email);
 
         Toast.makeText(this, "UserData saved: " + username + ", " + email, Toast.LENGTH_SHORT).show();
+    }
+    // Hàm hiển thị dialog cho người dùng chọn loại tài khoản và lưu vào SharedPreferences
+    private void showAccountTypeDialog() {
+        // Tạo danh sách các tùy chọn loại tài khoản
+        String[] accountTypes = {"Personal", "Business"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Account Type");
+        builder.setSingleChoiceItems(accountTypes, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                // Lưu giá trị boolean vào SharedPreferences
+                if (which == 0) {
+                    editor.putBoolean("isPersonnal", true); // Personal
+                } else {
+                    editor.putBoolean("isPersonnal", false); // Business
+                }
+                editor.apply();
+
+                dialog.dismiss();
+
+                // Chuyển `UserData` sang `GeneralActivity` sau khi đã lưu loại tài khoản
+                Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
+                intent.putExtra("username", userData.getUsername());
+                intent.putExtra("email", userData.getEmail());
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.create().show();
     }
 }

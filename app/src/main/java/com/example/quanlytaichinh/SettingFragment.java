@@ -1,5 +1,6 @@
 package com.example.quanlytaichinh;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,26 +28,19 @@ public class SettingFragment extends Fragment {
         RelativeLayout accountLayout = view.findViewById(R.id.account_layout);
 
         // Thiết lập sự kiện click cho RelativeLayout
-        accountLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Chuyển đến AccountFragment
-                AccountFragment accountFragment = new AccountFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame_layout, accountFragment); // Thay thế fragment tại container
-                fragmentTransaction.addToBackStack(null); // Thêm vào back stack
-                fragmentTransaction.commit();
-            }
+        accountLayout.setOnClickListener(v -> {
+            // Chuyển đến AccountFragment
+            AccountFragment accountFragment = new AccountFragment();
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, accountFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         // Nhận dữ liệu từ Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
             String email = bundle.getString("email");
-
-            // Nếu cần hiển thị email hoặc thông tin khác trong accountLayout, bạn có thể thêm TextView tại đây.
-            // Ví dụ: giả sử bạn có một TextView trong accountLayout để hiển thị email.
             TextView tv_account = accountLayout.findViewById(R.id.tv_account);
             tv_account.setText(email);
         }
@@ -57,7 +49,6 @@ public class SettingFragment extends Fragment {
 
         // Tạo danh sách các item setting
         List<SettingItem> settingItems = new ArrayList<>();
-        //Thêm các item ở đây
         settingItems.add(new SettingItem("General Setting", R.mipmap.ic_general_setting_foreground));
         settingItems.add(new SettingItem("Time Setting", R.mipmap.ic_time_setting_foreground));
         settingItems.add(new SettingItem("Guiding and Information", R.mipmap.ic_guide_and_info_foreground));
@@ -67,6 +58,33 @@ public class SettingFragment extends Fragment {
         // Tạo adapter và thiết lập cho ListView
         SettingAdapter adapter = new SettingAdapter(getContext(), settingItems);
         lvSetting.setAdapter(adapter);
+
+        lvSetting.setOnItemClickListener((parent, view1, position, id) -> {
+            // Xử lý sự kiện khi item được chọn
+            Intent intent;
+            switch (position) {
+                case 0: // General Setting
+                    intent = new Intent(getActivity(), GeneralSettingActivity.class);
+                    startActivity(intent);
+                    break;
+                case 1: // Time Setting
+                    intent = new Intent(getActivity(), TimeSettingActivity.class);
+                    startActivity(intent);
+                    break;
+                case 2:
+
+                    break;
+                case 3:
+
+                    break;
+                case 4: // Feedback
+                    intent = new Intent(getActivity(), FeedbackActivity.class);
+                    startActivity(intent);
+                    break;
+                default:
+                    break;
+            }
+        });
 
         return view;
     }

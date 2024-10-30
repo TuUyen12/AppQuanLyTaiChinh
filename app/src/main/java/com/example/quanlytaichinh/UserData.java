@@ -24,7 +24,6 @@ public class UserData {
         this.email = email;
     }
 
-
     public void setUsername(String username) {
         this.username = username;
     }

@@ -1,6 +1,7 @@
 package com.example.quanlytaichinh;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ public class InsertAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<InsertItem> gridItems;
+    private int selectedPosition = -1;
 
     public InsertAdapter(Context context, ArrayList<InsertItem> gridItems) {
         this.context = context;
@@ -47,7 +49,16 @@ public class InsertAdapter extends BaseAdapter {
         InsertItem gridItem = gridItems.get(position);
         imageView.setImageResource(gridItem.getImageResId());
         textView.setText(gridItem.getTitle());
+        // Thay đổi màu nền của item dựa trên vị trí đã chọn
+        if (position == selectedPosition) {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.color11)); // Màu nền đã chọn
+        } else {
+            convertView.setBackgroundColor(Color.TRANSPARENT); // Màu nền mặc định
+        }
 
         return convertView;
+    }
+    public void setSelectedPosition(int position) {
+        selectedPosition = position;
     }
 }

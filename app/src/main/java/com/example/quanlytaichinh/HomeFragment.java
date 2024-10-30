@@ -1,7 +1,10 @@
 package com.example.quanlytaichinh;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +108,7 @@ public class HomeFragment extends Fragment {
 
         // Thiết lập spinner year:
         Spinner spinnerYear = view.findViewById(R.id.spinner_year);
+
         String[] yearOptions = {"2024","2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010"};
         CustomSpinnerAdapter adapterYear = new CustomSpinnerAdapter(requireContext(), yearOptions);
         spinnerYear.setAdapter(adapterYear);
@@ -153,6 +157,7 @@ public class HomeFragment extends Fragment {
     }
 
     // Hàm thiết lập PieChart
+    // Hàm thiết lập PieChart
     private void setupPieChart(PieChart pieChart, ArrayList<PieEntry> userPieEntries) {
         PieDataSet pieDataSet = new PieDataSet(userPieEntries, "");
 
@@ -161,16 +166,27 @@ public class HomeFragment extends Fragment {
         pieColors.add(getResources().getColor(R.color.color1));
         pieColors.add(getResources().getColor(R.color.color2));
         pieColors.add(getResources().getColor(R.color.color3));
+        pieColors.add(getResources().getColor(R.color.color4));
+        pieColors.add(getResources().getColor(R.color.color5));
+        pieColors.add(getResources().getColor(R.color.color6));
+        pieColors.add(getResources().getColor(R.color.color7));
+        pieColors.add(getResources().getColor(R.color.color8));
+        pieColors.add(getResources().getColor(R.color.color9));
+        pieColors.add(getResources().getColor(R.color.color10));
 
+        // Thiết lập màu sắc cho các phần
         pieDataSet.setColors(pieColors);
+
         pieDataSet.setValueTextColor(Color.BLACK);
         pieDataSet.setValueTextSize(16f);
         pieDataSet.setValueFormatter(new PercentFormatter());
         pieDataSet.setSliceSpace(3f);
 
+
         // Tạo dữ liệu cho PieChart
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
+
         // Ẩn giá trị và nhãn hiển thị trên biểu đồ
         pieDataSet.setValueTextColor(Color.TRANSPARENT); // Ẩn số liệu
         pieDataSet.setValueTextSize(0f); // Không hiển thị kích thước văn bản
@@ -181,12 +197,16 @@ public class HomeFragment extends Fragment {
 
         // Thiết lập chú thích (Legend)
         Legend legend = pieChart.getLegend();
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         legend.setOrientation(Legend.LegendOrientation.VERTICAL);
         legend.setDrawInside(false); // Chú thích nằm bên ngoài biểu đồ
         legend.setTextColor(Color.BLACK);
-        legend.setTextSize(14f);
+        legend.setTextSize(12f);
+
+        // Điều chỉnh khoảng cách giữa legend và pie chart
+        legend.setYOffset(30f);
+
 
         // Ẩn tiêu đề của PieChart
         pieChart.getDescription().setEnabled(false);
@@ -194,13 +214,31 @@ public class HomeFragment extends Fragment {
         pieChart.invalidate(); // Làm mới PieChart
     }
 
+
     // Giả lập hàm lấy dữ liệu người dùng cho PieChart
     private ArrayList<PieEntry> getUserPieData() {
+
+        // Khởi tạo SharedPreferences
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+
+        // Lấy giá trị của `isPersonnal`, với giá trị mặc định là `false` nếu biến chưa được lưu
+        boolean isPersonnal = sharedPreferences.getBoolean("isPersonnal", false);
+
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
-        pieEntries.add(new PieEntry(25f, "Bill"));       // Hóa đơn
-        pieEntries.add(new PieEntry(15f, "Education"));  // Giáo dục
-        pieEntries.add(new PieEntry(30f, "Food"));       // Ăn uống
-        // Dữ liệu sẽ thay đổi tùy thuộc vào nguồn người dùng
+
+        if (isPersonnal) {
+            pieEntries.add(new PieEntry(25f, "Bill"));       // Hóa đơn
+            pieEntries.add(new PieEntry(15f, "Education"));  // Giáo dục
+            pieEntries.add(new PieEntry(30f, "Food"));       // Ăn uống
+            // Dữ liệu sẽ thay đổi tùy thuộc vào nguồn người dùng
+        }
+        else{
+            pieEntries.add(new PieEntry(15f, "Marketing"));       // Tiếp thị
+            pieEntries.add(new PieEntry(15f, "Maintenance"));  // Bảo trì
+            pieEntries.add(new PieEntry(30f, "Project Costs"));       // Dự án
+            pieEntries.add(new PieEntry(20f, "Personnel Costs")); //lương nhân viên
+        }
+
         return pieEntries;
     }
 

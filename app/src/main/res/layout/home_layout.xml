@@ -33,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="2"
-                app:layout_constraintTop_toBottomOf="@id/tv_welcome"
                 android:orientation="horizontal"
                 android:padding="10dp">
 
@@ -41,8 +40,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="4"
-                    android:background="@color/white"
-                    android:orientation="vertical">
+                    android:background="@color/white">
 
                     <TextView
                         android:id="@+id/tv_textbalance"
@@ -80,6 +78,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/ll_general"
             android:layout_width="match_parent"
@@ -90,22 +89,22 @@
             app:layout_constraintTop_toBottomOf="@id/ll_balance"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
                 android:text="Expense vs Income"
                 android:layout_marginStart="10dp"
-                android:textSize="20sp"
-                android:textColor="@color/my_light_primary">
-            </TextView>
+                android:textSize="22sp"
+                android:textColor="@color/my_light_primary" />
+
             <Spinner
                 android:id="@+id/spinner_duration"
                 android:layout_marginStart="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.75">
-            </Spinner>
+                android:layout_weight="0.75" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -113,39 +112,53 @@
                 android:layout_weight="3">
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/barChart"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="150dp"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true">
                 </com.github.mikephil.charting.charts.BarChart>
+
             </RelativeLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@color/color1">
+
+            </View>
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="3">
-            </com.github.mikephil.charting.charts.PieChart>
-
+                android:layout_weight="4" />
 
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@color/color1"
+            app:layout_constraintTop_toBottomOf="@id/ll_general">
+        </View>
+
         <LinearLayout
             android:id="@+id/ll_financial"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="430dp"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/ll_general"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.5"
                 android:layout_marginStart="10dp"
                 android:text="Expense analysis"
-                android:textSize="20sp"
-                android:textColor="@color/my_light_primary">
-            </TextView>
+                android:layout_marginTop="8dp"
+                android:textSize="22sp"
+                android:textColor="@color/my_light_primary" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -154,25 +167,30 @@
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
                     android:src="@drawable/calendar1_with_size"
-                    android:layout_centerVertical="true">
+                    android:layout_centerVertical="true" />
 
-                </ImageView>
                 <Spinner
                     android:id="@+id/spinner_year"
                     android:layout_width="140dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="40dp">
-
-                </Spinner>
+                    android:layout_marginStart="40dp" />
             </RelativeLayout>
 
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChart_financial"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5">
-            </com.github.mikephil.charting.charts.BarChart>
+                android:layout_weight="5"/>
+
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@color/color1"
+            app:layout_constraintTop_toBottomOf="@id/ll_financial"
+            android:layout_marginTop="20dp">
+
+        </View>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

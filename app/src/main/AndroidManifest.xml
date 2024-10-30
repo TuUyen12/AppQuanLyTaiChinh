@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Thêm quyền truy cập Internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,9 +16,8 @@
         android:theme="@style/Theme.QuanLyTaiChinh"
         tools:targetApi="31">
 
-        <!-- Chuyển intent-filter từ MainActivity sang GeneralActivity -->
         <activity
-            android:name=".GeneralActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,13 +25,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".GeneralActivity"
             android:exported="true"
             android:theme="@style/Theme.QuanLyTaiChinh" />
 
         <activity android:name=".SignInActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".InfoAccountActivity" />
+        <activity android:name=".FeedbackActivity" />
+        <activity android:name=".GeneralSettingActivity" />
+        <activity android:name=".TimeSettingActivity" />
 
     </application>
 </manifest>
