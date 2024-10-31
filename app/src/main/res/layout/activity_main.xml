@@ -11,7 +11,7 @@
         android:id="@+id/icon_app"
         android:layout_width="400dp"
         android:layout_height="400dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="68dp"
         android:src="@drawable/icon_app"
         app:layout_constraintLeft_toLeftOf="parent"
