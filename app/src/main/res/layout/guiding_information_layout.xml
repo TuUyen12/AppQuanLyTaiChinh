@@ -1,0 +1,99 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User Guide"
+            android:textSize="26sp"
+            android:padding="16dp"
+            android:background="@color/my_light_primary"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Record Transactions:\n- To record a financial transaction, choose either the &#34;Income&#34; or &#34;Expense&#34; button.\n- This will display the respective categories for recording your transactions."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2. Current Date:\n- The current date is shown at the top of the screen, which is automatically retrieved from the system&#39;s calendar."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3. Select a Category:\n- Click on the appropriate button to toggle between income and expense categories.\n- By default, the fragment will display expense items."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4. View Items:\n- Each category comes with a list of predefined items you can select.\n- Click on an item to highlight it; this will help you keep track of your selected transaction."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5. Personal vs Business:\n- The app determines if you are using it as an individual or a business based on your settings.\n- The list of income and expense items will adjust accordingly."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="6. Add New Transactions:\n- To add a new transaction, click the &#34;Add&#34; option in either the income or expense category.\n- Follow the prompts to enter your transaction details."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="7. Monitor Financial Status:\n- The selected financial category (Income or Expense) is displayed prominently to help you monitor your financial status.\n- Make sure to regularly update your transactions for accurate tracking."
+            android:textSize="16sp"
+            android:paddingBottom="8dp"
+            android:padding="16dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="About the App"
+            android:textSize="24sp"
+            android:paddingBottom="16dp"
+            android:padding="16dp"
+            android:background="@color/my_light_primary"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This financial management app helps you track your expenses, set budgets, and manage your finances efficiently."
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:padding="16dp"/>
+
+    </LinearLayout>
+</ScrollView>

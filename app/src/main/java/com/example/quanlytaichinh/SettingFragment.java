@@ -61,10 +61,8 @@ public class SettingFragment extends Fragment {
 
         // Tạo danh sách các item setting
         List<SettingItem> settingItems = new ArrayList<>();
-        settingItems.add(new SettingItem("General Setting", R.mipmap.ic_general_setting_foreground));
         settingItems.add(new SettingItem("Time Setting", R.mipmap.ic_time_setting_foreground));
         settingItems.add(new SettingItem("Guiding and Information", R.mipmap.ic_guide_and_info_foreground));
-        settingItems.add(new SettingItem("Language", R.mipmap.ic_language_foreground));
         settingItems.add(new SettingItem("Feedback", R.mipmap.ic_feedback_foreground));
 
         // Tạo adapter và thiết lập cho ListView
@@ -75,21 +73,15 @@ public class SettingFragment extends Fragment {
             // Xử lý sự kiện khi item được chọn
             Intent intent;
             switch (position) {
-                case 0: // General Setting
-                    intent = new Intent(getActivity(), GeneralSettingActivity.class);
-                    startActivity(intent);
-                    break;
-                case 1: // Time Setting
+                case 0: // Time Setting
                     intent = new Intent(getActivity(), TimeSettingActivity.class);
                     startActivity(intent);
                     break;
+                case 1:
+                    intent = new Intent(getActivity(), GuidingInformationActivity.class);
+                    startActivity(intent);
+                    break;
                 case 2:
-                    // Xử lý cho Guiding and Information
-                    break;
-                case 3:
-                    // Xử lý cho Language
-                    break;
-                case 4: // Feedback
                     intent = new Intent(getActivity(), FeedbackActivity.class);
                     startActivity(intent);
                     break;
