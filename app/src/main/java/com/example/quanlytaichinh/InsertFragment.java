@@ -89,7 +89,7 @@ public class InsertFragment extends Fragment {
             insertAdapter.notifyDataSetChanged(); // Cập nhật GridView
         });
 
-         // Sự kiện bấm nút Expense
+        // Sự kiện bấm nút Expense
         btnExpense.setOnClickListener(v -> {
             insertItems.clear(); // Xóa danh sách hiện tại
             insertItems.addAll(expenseItems); // Thêm danh sách expense
@@ -113,8 +113,6 @@ public class InsertFragment extends Fragment {
             insertAdapter.notifyDataSetChanged();
         });
 
-
-
         return view;
     }
 
@@ -132,42 +130,40 @@ public class InsertFragment extends Fragment {
         if (isPersonnal) {
             // Nếu là cá nhân, hiển thị danh sách cá nhân
             // Khởi tạo danh sách cho expense
-            expenseItems.add(new InsertItem(R.drawable.ic_transport, "Transport"));
-            expenseItems.add(new InsertItem(R.drawable.ic_food, "Food"));
-            expenseItems.add(new InsertItem(R.drawable.ic_edu, "Education"));
-            expenseItems.add(new InsertItem(R.drawable.ic_cloths, "Cloths"));
-            expenseItems.add(new InsertItem(R.drawable.ic_medical, "Medical"));
-            expenseItems.add(new InsertItem(R.drawable.ic_contact_fee, "Contact Fee"));
-            expenseItems.add(new InsertItem(R.drawable.ic_cosmetic, "Cosmetic"));
-            expenseItems.add(new InsertItem(R.drawable.ic_housing_expenses, "Housing expense"));
+            expenseItems.add(new InsertItem(1, R.drawable.ic_transport, "Transport", "expense"));
+            expenseItems.add(new InsertItem(2, R.drawable.ic_food, "Food", "expense"));
+            expenseItems.add(new InsertItem(3, R.drawable.ic_edu, "Education", "expense"));
+            expenseItems.add(new InsertItem(4, R.drawable.ic_cloths, "Cloths", "expense"));
+            expenseItems.add(new InsertItem(5, R.drawable.ic_medical, "Medical", "expense"));
+            expenseItems.add(new InsertItem(6, R.drawable.ic_contact_fee, "Contact Fee", "expense"));
+            expenseItems.add(new InsertItem(7, R.drawable.ic_cosmetic, "Cosmetic", "expense"));
+            expenseItems.add(new InsertItem(8, R.drawable.ic_housing_expenses, "Housing expense", "expense"));
 
             // Khởi tạo danh sách cho income
-            incomeItems = new ArrayList<>();
-            incomeItems.add(new InsertItem(R.drawable.ic_salary, "Salary"));
-            incomeItems.add(new InsertItem(R.drawable.ic_bonus, "Bonus"));
-            incomeItems.add(new InsertItem(R.drawable.ic_investment, "Investment"));
-        }
-        else {
+            incomeItems.add(new InsertItem(9, R.drawable.ic_salary, "Salary", "income"));
+            incomeItems.add(new InsertItem(10, R.drawable.ic_bonus, "Bonus", "income"));
+            incomeItems.add(new InsertItem(11, R.drawable.ic_investment, "Investment", "income"));
+        } else {
             // Nếu là doanh nghiệp, thêm các mục cho doanh nghiệp
-            expenseItems.add(new InsertItem(R.drawable.ic_office_supplies, "Office Supplies"));
-            expenseItems.add(new InsertItem(R.drawable.ic_travel, "Travel"));
-            expenseItems.add(new InsertItem(R.drawable.ic_utilities, "Utilities")); // Chi phí tiện ích
-            expenseItems.add(new InsertItem(R.drawable.ic_marketing, "Marketing")); // Chi phí tiếp thị
-            expenseItems.add(new InsertItem(R.drawable.ic_personnel, "Personnel Costs")); // Chi phí nhân sự
-            expenseItems.add(new InsertItem(R.drawable.ic_maintenance, "Maintenance")); // Chi phí bảo trì
-            expenseItems.add(new InsertItem(R.drawable.ic_project, "Project Costs")); // Chi phí dự án
+            expenseItems.add(new InsertItem(12, R.drawable.ic_office_supplies, "Office Supplies", "expense"));
+            expenseItems.add(new InsertItem(13, R.drawable.ic_travel, "Travel", "expense"));
+            expenseItems.add(new InsertItem(14, R.drawable.ic_utilities, "Utilities", "expense")); // Chi phí tiện ích
+            expenseItems.add(new InsertItem(15, R.drawable.ic_marketing, "Marketing", "expense")); // Chi phí tiếp thị
+            expenseItems.add(new InsertItem(16, R.drawable.ic_personnel, "Personnel Costs", "expense")); // Chi phí nhân sự
+            expenseItems.add(new InsertItem(17, R.drawable.ic_maintenance, "Maintenance", "expense")); // Chi phí bảo trì
+            expenseItems.add(new InsertItem(18, R.drawable.ic_project, "Project Costs", "expense")); // Chi phí dự án
             // ... thêm các mục khác cho doanh nghiệp
 
-            incomeItems.add(new InsertItem(R.drawable.ic_project_payment, "Project Payment")); // Doanh thu từ dự án
-            incomeItems.add(new InsertItem(R.drawable.ic_investment, "Investment")); // Doanh thu từ đầu tư
-            incomeItems.add(new InsertItem(R.drawable.ic_sales, "Sales Revenue")); // Doanh thu từ bán hàng
+            incomeItems.add(new InsertItem(19, R.drawable.ic_project_payment, "Project Payment", "income")); // Doanh thu từ dự án
+            incomeItems.add(new InsertItem(20, R.drawable.ic_investment, "Investment", "income")); // Doanh thu từ đầu tư
+            incomeItems.add(new InsertItem(21, R.drawable.ic_sales, "Sales Revenue", "income")); // Doanh thu từ bán hàng
 
             // ... thêm các mục khác cho doanh nghiệp
         }
 
         // Thêm mục "Add" cho cả hai loại
-        expenseItems.add(new InsertItem(R.drawable.ic_add, "Add"));
-        incomeItems.add(new InsertItem(R.drawable.ic_add, "Add"));
+        expenseItems.add(new InsertItem(22, R.drawable.ic_add, "Add", "expense"));
+        incomeItems.add(new InsertItem(23, R.drawable.ic_add, "Add", "income"));
     }
 
     private void setCurrentDate() {

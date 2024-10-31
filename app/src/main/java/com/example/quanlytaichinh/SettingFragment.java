@@ -31,18 +31,30 @@ public class SettingFragment extends Fragment {
         accountLayout.setOnClickListener(v -> {
             // Chuyển đến AccountFragment
             AccountFragment accountFragment = new AccountFragment();
+
+            // Truyền dữ liệu vào Bundle
+            Bundle bundle = new Bundle();
+            if (user != null) {
+                bundle.putSerializable("userData", user); // Chuyển đối tượng UserData
+            }
+            accountFragment.setArguments(bundle); // Gán Bundle vào Fragment
+
+            // Thay thế Fragment
             getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, accountFragment)
+                    .replace(R.id.frame_layout, accountFragment) // Đảm bảo bạn đang thay thế bằng Fragment
                     .addToBackStack(null)
                     .commit();
         });
 
+
         // Nhận dữ liệu từ Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
-            String email = bundle.getString("email");
-            TextView tv_account = accountLayout.findViewById(R.id.tv_account);
-            tv_account.setText(email);
+            user = (UserData) bundle.getSerializable("userData"); // Nhận đối tượng UserData
+            if (user != null) {
+                TextView tv_account = accountLayout.findViewById(R.id.tv_account);
+                tv_account.setText(user.getEmail()); // Hiển thị email từ UserData
+            }
         }
 
         ListView lvSetting = view.findViewById(R.id.lv_setting);
@@ -72,10 +84,10 @@ public class SettingFragment extends Fragment {
                     startActivity(intent);
                     break;
                 case 2:
-
+                    // Xử lý cho Guiding and Information
                     break;
                 case 3:
-
+                    // Xử lý cho Language
                     break;
                 case 4: // Feedback
                     intent = new Intent(getActivity(), FeedbackActivity.class);
@@ -89,3 +101,4 @@ public class SettingFragment extends Fragment {
         return view;
     }
 }
+

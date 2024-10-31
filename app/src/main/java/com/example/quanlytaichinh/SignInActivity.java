@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +25,7 @@ public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Button loginButton, resetPasswordButton; // Thêm nút reset password
     private UserData userData; // Đối tượng UserData để lưu thông tin người dùng
-
+    private TextView tv_ForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,15 @@ public class SignInActivity extends AppCompatActivity {
 
         EditText et_email = findViewById(R.id.et_email);
         EditText et_password = findViewById(R.id.et_password);
+        //Sự kiện khi ấn forgot password
+        tv_ForgotPassword = findViewById(R.id.tv_forgot_password);
+        tv_ForgotPassword.setOnClickListener(v -> {
+
+            // Chuyển đến ForgotPassActivity khi nhấn vào TextView
+            Intent intent = new Intent(this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
+
         loginButton = findViewById(R.id.btn_sign_in);
 
         loginButton.setOnClickListener(v -> {
@@ -100,10 +110,11 @@ public class SignInActivity extends AppCompatActivity {
             username = email != null ? email.split("@")[0] : "Unknown User";
         }
 
-        userData = new UserData(username, email);
+        userData = new UserData(username, email); // Khởi tạo UserData với ID
 
         Toast.makeText(this, "UserData saved: " + username + ", " + email, Toast.LENGTH_SHORT).show();
     }
+
     // Hàm hiển thị dialog cho người dùng chọn loại tài khoản và lưu vào SharedPreferences
     private void showAccountTypeDialog() {
         // Tạo danh sách các tùy chọn loại tài khoản
@@ -131,6 +142,7 @@ public class SignInActivity extends AppCompatActivity {
                 Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
                 intent.putExtra("username", userData.getUsername());
                 intent.putExtra("email", userData.getEmail());
+                intent.putExtra("userData", userData);
                 startActivity(intent);
                 finish();
             }

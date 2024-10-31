@@ -27,12 +27,14 @@ public class GeneralActivity extends AppCompatActivity {
         ibHome.setBackgroundColor(ContextCompat.getColor(this, R.color.white)); // Nền trắng
         ibHome.setImageResource(R.drawable.home1_with_size); // Hình ảnh hiển thị ban đầu
 
+
         // Hiển thị HomeFragment mặc định khi đăng nhập
         showFragment(new HomeFragment());
 
         // Nhận dữ liệu từ Intent
         String username = getIntent().getStringExtra("username");
         String email = getIntent().getStringExtra("email");
+        UserData userData = (UserData) getIntent().getSerializableExtra("userData");
 
         // Thiết lập sự kiện cho nút Home
         ibHome.setOnClickListener(new View.OnClickListener() {
@@ -65,9 +67,12 @@ public class GeneralActivity extends AppCompatActivity {
         ibSetting.setOnClickListener(view -> {
             // Tạo đối tượng SettingFragment và truyền dữ liệu
             SettingFragment settingFragment = new SettingFragment();
+            // Truyền dữ liệu vào Bundle
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
             bundle.putString("email", email);
+            bundle.putSerializable("userData", userData);
+            // Đặt Bundle vào Fragment
             settingFragment.setArguments(bundle);
             showFragment(settingFragment);
             resetButtonStyles(ibHome, ibCalendar, ibInsert, ibChart, ibSetting, view);

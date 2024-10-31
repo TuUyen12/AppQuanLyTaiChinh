@@ -7,20 +7,20 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
+        android:text=""
+        app:layout_constraintTop_toBottomOf="@id/iv_avatar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/iv_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/ic_account1"
+        app:srcCompat="@drawable/avatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,17 +29,17 @@
         android:id="@+id/btn_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sửa"
-        app:layout_constraintTop_toBottomOf="@id/textView"
+        android:text="Edit"
+        app:layout_constraintTop_toBottomOf="@id/tv_id"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
     <Button
-        android:id="@+id/button_change_password"
+        android:id="@+id/btn_change_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Đổi mật khẩu"
+        android:text="Change password"
         app:layout_constraintTop_toBottomOf="@id/btn_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,11 +48,11 @@
         android:layout_marginEnd="16dp" />
 
     <Button
-        android:id="@+id/button_logout"
+        android:id="@+id/btn_sign_out"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Đăng xuất"
-        app:layout_constraintTop_toBottomOf="@id/button_change_password"
+        android:text="Sign out"
+        app:layout_constraintTop_toBottomOf="@id/btn_change_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"

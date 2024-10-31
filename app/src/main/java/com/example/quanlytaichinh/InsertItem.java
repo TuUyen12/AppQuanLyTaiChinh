@@ -1,12 +1,20 @@
 package com.example.quanlytaichinh;
 
 public class InsertItem {
-    private int imageResId;
-    private String title;
+    private int id; // ID danh mục
+    private int imageResId; // Hình ảnh đại diện
+    private String title; // Tên danh mục
+    private String categoryType; // Loại danh mục (ví dụ: "income", "expense")
 
-    public InsertItem(int imageResId, String title) {
+    public InsertItem(int id, int imageResId, String title, String categoryType) {
+        this.id = id;
         this.imageResId = imageResId;
         this.title = title;
+        this.categoryType = categoryType;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getImageResId() {
@@ -15,5 +23,9 @@ public class InsertItem {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getCategoryType() {
+        return categoryType;
     }
 }
