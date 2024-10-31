@@ -109,7 +109,8 @@ public class HomeFragment extends Fragment {
         // Thiết lập spinner year:
         Spinner spinnerYear = view.findViewById(R.id.spinner_year);
 
-        String[] yearOptions = {"2024","2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010"};
+        String[] yearOptions = generateYearOptions(2024, 2010);
+
         CustomSpinnerAdapter adapterYear = new CustomSpinnerAdapter(requireContext(), yearOptions);
         spinnerYear.setAdapter(adapterYear);
         adapterYear.setSelectedPosition(0);
@@ -212,6 +213,13 @@ public class HomeFragment extends Fragment {
 
         pieChart.invalidate(); // Làm mới PieChart
     }
+    private String[] generateYearOptions(int startYear, int endYear) {
+        ArrayList<String> years = new ArrayList<>();
+        for (int i = startYear; i >= endYear; i--) {
+            years.add(String.valueOf(i));
+        }
+        return years.toArray(new String[0]);
+    }
 
 
     // Giả lập hàm lấy dữ liệu người dùng cho PieChart
@@ -245,8 +253,8 @@ public class HomeFragment extends Fragment {
     // Hàm thiết lập BarChart với hai cột: chi phí và thu nhập
     private void setupBarChartExpenseIncome(BarChart barChart) {
         // Giả sử lấy dữ liệu chi phí và thu nhập từ người dùng
-        float userExpense = getUserExpense(); // Hàm giả định để lấy dữ liệu chi phí
-        float userIncome = getUserIncome();   // Hàm giả định để lấy dữ liệu thu nhập
+        float userExpense = 10f;
+        float userIncome = 30f;   // Hàm giả định để lấy dữ liệu thu nhập
 
         ArrayList<BarEntry> barEntries1 = new ArrayList<>();
         barEntries1.add(new BarEntry(0, userExpense)); // Cột 1 (Chi phí)
@@ -268,16 +276,16 @@ public class HomeFragment extends Fragment {
         barChart.invalidate();
     }
 
-    // Hàm giả định để lấy dữ liệu chi phí từ người dùng
     private float getUserExpense() {
-
-        return 10f; // Ví dụ dữ liệu chi phí
+        // Giả lập lấy dữ liệu chi phí từ một cơ sở dữ liệu hoặc từ tài khoản người dùng
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getFloat("UserExpense", 0f); // Giá trị mặc định là 0 nếu không có dữ liệu
     }
 
-    // Hàm giả định để lấy dữ liệu thu nhập từ người dùng
     private float getUserIncome() {
-
-        return 20f; // Ví dụ dữ liệu thu nhập
+        // Giả lập lấy dữ liệu chi phí từ một cơ sở dữ liệu hoặc từ tài khoản người dùng
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        return prefs.getFloat("UserExpense", 0f); // Giá trị mặc định là 0 nếu không có dữ liệu
     }
 
     // Hàm thiết lập BarChart tài chính với dữ liệu từ người dùng
