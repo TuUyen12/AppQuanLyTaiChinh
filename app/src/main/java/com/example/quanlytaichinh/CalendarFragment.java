@@ -1,5 +1,8 @@
 package com.example.quanlytaichinh;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +21,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class CalendarFragment extends Fragment {
@@ -48,6 +54,28 @@ public class CalendarFragment extends Fragment {
         calendarView = view.findViewById(R.id.calendarView);
         ibInsert = view.findViewById(R.id.ib_insert);
         tvShowDay = view.findViewById(R.id.tv_show_day);
+        ListView listView = view.findViewById(R.id.lv_show_insert);
+
+        // Khởi tạo SharedPreferences
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+
+        // Lấy giá trị của `isPersonnal`, với giá trị mặc định là `false` nếu biến chưa được lưu
+        boolean isPersonnal = sharedPreferences.getBoolean("isPersonnal", false);
+        List<CalendarItem> calendarItems = new ArrayList<>();
+        if (isPersonnal) {
+            calendarItems.add(new CalendarItem("Ăn sáng", "expense",  50000 , R.drawable.ic_food));
+            calendarItems.add(new CalendarItem("Lương tháng 10", "income", 6000000, R.drawable.ic_salary));
+            calendarItems.add(new CalendarItem("Mỹ phẩm", "expense", 500000, R.drawable.ic_cosmetic));
+            calendarItems.add(new CalendarItem("Ăn trưa", "expense", 40000, R.drawable.ic_food));
+            calendarItems.add(new CalendarItem("Tài liệu", "expense", 20000, R.drawable.ic_edu));
+
+        }
+        else{
+            calendarItems.add(new CalendarItem("Quảng cáo", "expense", 3000000, R.drawable.ic_marketing));
+            calendarItems.add(new CalendarItem("Bảo trì", "expense", 4000000, R.drawable.ic_maintenance));
+            calendarItems.add(new CalendarItem("Dự án", "expense", 9000000, R.drawable.ic_project));
+        }
+
 
         // Lấy ngày hiện tại khi mở app lên
         Calendar currentDate = Calendar.getInstance();
@@ -100,6 +128,10 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
+
+        // Thiết lập adapter cho ListView
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+        listView.setAdapter(adapter);
 
         return view;
     }

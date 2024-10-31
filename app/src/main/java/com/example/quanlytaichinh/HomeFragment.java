@@ -157,7 +157,6 @@ public class HomeFragment extends Fragment {
     }
 
     // Hàm thiết lập PieChart
-    // Hàm thiết lập PieChart
     private void setupPieChart(PieChart pieChart, ArrayList<PieEntry> userPieEntries) {
         PieDataSet pieDataSet = new PieDataSet(userPieEntries, "");
 
