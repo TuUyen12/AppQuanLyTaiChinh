@@ -173,7 +173,7 @@
                     android:id="@+id/spinner_year"
                     android:layout_width="140dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="40dp" />
+                    android:layout_marginStart="40dp"/>
             </RelativeLayout>
 
             <com.github.mikephil.charting.charts.BarChart

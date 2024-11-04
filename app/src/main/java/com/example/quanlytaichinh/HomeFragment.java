@@ -140,6 +140,7 @@ public class HomeFragment extends Fragment {
         });
 
 
+
         // Thiết lập PieChart
         PieChart pieChart = view.findViewById(R.id.pieChart);
         setupPieChart(pieChart, getUserPieData());
