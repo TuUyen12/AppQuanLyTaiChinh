@@ -33,6 +33,7 @@ public class CalendarFragment extends Fragment {
     MaterialCalendarView calendarView;
     ImageButton ibInsert;
     TextView tvShowDay;
+    ListView lvShowInsert;
 
     // Biến lưu trữ ngày đã chọn
     private int selectedYear = -1;
@@ -55,7 +56,7 @@ public class CalendarFragment extends Fragment {
         calendarView = view.findViewById(R.id.calendarView);
         ibInsert = view.findViewById(R.id.ib_insert);
         tvShowDay = view.findViewById(R.id.tv_show_day);
-        ListView listView = view.findViewById(R.id.lv_show_insert);
+        lvShowInsert = view.findViewById(R.id.lv_show_insert);
 
         // Khởi tạo SharedPreferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
@@ -123,7 +124,8 @@ public class CalendarFragment extends Fragment {
 
         // Thiết lập adapter cho ListView
         CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
-        listView.setAdapter(adapter);
+        lvShowInsert.setAdapter(adapter);
+
 
         return view;
     }

@@ -29,7 +29,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:text="sign in"
         android:textAllCaps="true"
-        android:textSize="32sp">
+        android:textSize="32sp"
+        android:background="@drawable/button_style">
     </Button>
     <Button
         android:id="@+id/btn_sign_up"
@@ -41,7 +42,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:text="sign up"
         android:textAllCaps="true"
-        android:textSize="32sp">
+        android:textSize="32sp"
+        android:background="@drawable/button_style">
     </Button>
 </androidx.constraintlayout.widget.ConstraintLayout>
 

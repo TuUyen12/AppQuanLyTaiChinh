@@ -11,7 +11,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -68,7 +70,8 @@ public class AccountFragment extends Fragment {
         btn_sign_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signOut();
+
+                ShowChooseSignOut();
             }
         });
 
@@ -83,5 +86,26 @@ public class AccountFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         getActivity().finish(); // Kết thúc Activity hiện tại
+    }
+    private void ShowChooseSignOut(){
+        String message = "Do you want to sign out?";
+        // Hiển thị thông báo
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Sign out");
+        builder.setMessage(message);
+        // Xử lý sự kiện khi người dùng chọn Yes
+
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            // Xử lý đăng xuất
+            signOut();
+            Toast.makeText(getActivity(), "Signed out sucessfully!", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+          // Xử lý sự kiện khi người dùng chọn No
+        builder.setNegativeButton("No", (dialog, which) -> {
+            // Không làm gì khi người dùng chọn No
+        });
+        // Hiển thị dialog
+        builder.create().show();
     }
 }
