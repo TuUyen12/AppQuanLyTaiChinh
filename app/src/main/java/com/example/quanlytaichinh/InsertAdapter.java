@@ -49,16 +49,20 @@ public class InsertAdapter extends BaseAdapter {
         InsertItem gridItem = gridItems.get(position);
         imageView.setImageResource(gridItem.getImageResId());
         textView.setText(gridItem.getTitle());
-        // Thay đổi màu nền của item dựa trên vị trí đã chọn
+
+        // Áp dụng background dựa trên vị trí đã chọn
         if (position == selectedPosition) {
-            convertView.setBackgroundColor(context.getResources().getColor(R.color.color11)); // Màu nền đã chọn
+            convertView.setBackgroundResource(R.drawable.gridview_item_style_color); // Màu nền đã chọn
         } else {
-            convertView.setBackgroundColor(Color.TRANSPARENT); // Màu nền mặc định
+            convertView.setBackgroundResource(R.drawable.gridview_item_style); // Màu nền mặc định
         }
 
         return convertView;
     }
+
     public void setSelectedPosition(int position) {
         selectedPosition = position;
+        notifyDataSetChanged(); // Cập nhật lại GridView khi thay đổi vị trí đã chọn
     }
+
 }

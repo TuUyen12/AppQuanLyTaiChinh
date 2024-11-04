@@ -28,7 +28,10 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:drawableLeft="@drawable/mail_with_size"
-        android:drawablePadding="10dp">
+        android:inputType="textEmailAddress"
+        android:background="@drawable/custom_edittext"
+        android:drawablePadding="20dp"
+        android:paddingLeft="20dp">
     </EditText>
 
 
@@ -48,8 +51,10 @@
             android:layout_weight="5"
             android:hint="********"
             android:drawableLeft="@drawable/key_with_size"
-            android:drawablePadding="10dp"
-            android:inputType="textPassword">
+            android:inputType="textPassword"
+            android:background="@drawable/custom_edittext"
+            android:drawablePadding="20dp"
+            android:paddingLeft="20dp">
         </EditText>
         <ImageButton
             android:id="@+id/ib_eye"

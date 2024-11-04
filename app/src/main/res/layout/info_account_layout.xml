@@ -30,11 +30,14 @@
         android:id="@+id/et_username"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Nhập tên"
+        android:hint="Name"
         app:layout_constraintTop_toBottomOf="@id/tv_username"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@drawable/custom_edittext"
+        android:drawablePadding="20dp"
+        android:paddingLeft="20dp"/>
 
     <TextView
         android:id="@+id/tv_email"
@@ -43,23 +46,27 @@
         android:text="Email"
         app:layout_constraintTop_toBottomOf="@id/et_username"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        />
 
     <EditText
         android:id="@+id/et_email"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Nhập email"
+        android:hint="Enter email"
         app:layout_constraintTop_toBottomOf="@id/tv_email"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@drawable/custom_edittext"
+        android:drawablePadding="20dp"
+        android:paddingLeft="20dp"/>
 
     <TextView
         android:id="@+id/tv_birthday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ngày sinh"
+        android:text="Birthday"
         app:layout_constraintTop_toBottomOf="@id/et_email"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp" />
@@ -68,17 +75,20 @@
         android:id="@+id/et_birthday"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Nhập ngày sinh"
+        android:hint="1/1/2000"
         app:layout_constraintTop_toBottomOf="@id/tv_birthday"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@drawable/custom_edittext"
+        android:drawablePadding="20dp"
+        android:paddingLeft="20dp"/>
 
     <TextView
         android:id="@+id/tv_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Địa chỉ"
+        android:text="Address"
         app:layout_constraintTop_toBottomOf="@id/et_birthday"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp" />
@@ -87,33 +97,44 @@
         android:id="@+id/et_address"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Nhập địa chỉ"
+        android:hint="Enter address:"
         app:layout_constraintTop_toBottomOf="@id/tv_address"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@drawable/custom_edittext"
+        android:drawablePadding="20dp"
+        android:paddingLeft="20dp"/>
+    <TextView
+        android:id="@+id/tv_gender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gender:"
+        app:layout_constraintTop_toBottomOf="@id/et_address"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/et_address"
+        app:layout_constraintTop_toBottomOf="@id/tv_gender"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="10dp">
 
         <RadioButton
             android:id="@+id/radioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nam" />
+            android:text="Male" />
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nữ"
+            android:text="Female"
             android:layout_marginStart="150dp"/>
     </RadioGroup>
 
