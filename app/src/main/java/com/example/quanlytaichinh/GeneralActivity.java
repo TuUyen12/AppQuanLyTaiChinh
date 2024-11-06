@@ -2,9 +2,6 @@ package com.example.quanlytaichinh;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -27,10 +24,8 @@ public class GeneralActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.chart_with_size).setContentDescription("Chart"));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.setting_with_size).setContentDescription("Setting"));
 
-
         // Hiển thị HomeFragment mặc định khi đăng nhập
         showFragment(new HomeFragment());
-
 
         // Nhận dữ liệu từ Intent
         String username = getIntent().getStringExtra("username");
@@ -57,7 +52,16 @@ public class GeneralActivity extends AppCompatActivity {
                         selectedFragment = new ChartFragment();
                         break;
                     case 4:
-                        selectedFragment = new SettingFragment();
+                        // Tạo đối tượng SettingFragment và truyền dữ liệu
+                        SettingFragment settingFragment = new SettingFragment();
+                        // Truyền dữ liệu vào Bundle
+                        Bundle bundle = new Bundle();
+                        bundle.putString("username", username);
+                        bundle.putString("email", email);
+                        bundle.putSerializable("userData", userData);
+                        // Đặt Bundle vào Fragment
+                        settingFragment.setArguments(bundle);
+                        selectedFragment = settingFragment;
                         break;
                 }
 
@@ -84,5 +88,4 @@ public class GeneralActivity extends AppCompatActivity {
                 .replace(R.id.frame_layout, fragment)
                 .commit();
     }
-
 }

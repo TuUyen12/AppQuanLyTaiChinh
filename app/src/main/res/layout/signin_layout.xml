@@ -91,7 +91,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:text="sign in"
+        android:textColor="@color/white"
         android:textAllCaps="true"
+        android:background="@drawable/button_style"
         android:textSize="32sp">
     </Button>
 </androidx.constraintlayout.widget.ConstraintLayout>

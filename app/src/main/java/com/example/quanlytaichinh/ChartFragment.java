@@ -48,7 +48,7 @@ public class ChartFragment extends Fragment {
         View view = inflater.inflate(R.layout.chart_layout, container, false);
         Spinner spinner = view.findViewById(R.id.spinner_type);
 
-        String[] typeOptions = {"expense", "income"};
+        String[] typeOptions = {"Expense", "Income"};
         CustomSpinnerAdapter adapter = new CustomSpinnerAdapter(requireContext(), typeOptions);
         spinner.setAdapter(adapter);
         spinner.setSelection(0); // Default selection
@@ -192,7 +192,7 @@ public class ChartFragment extends Fragment {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         boolean isPersonal = sharedPreferences.getBoolean("isPersonnal", false);
 
-        if (currentType.equals("expense")) {
+        if (currentType.equals("Expense")) {
             if (isPersonal) {
                 pieEntries.add(new PieEntry(25f, "Bill"));
                 pieEntries.add(new PieEntry(15f, "Education"));
@@ -204,7 +204,7 @@ public class ChartFragment extends Fragment {
                 pieEntries.add(new PieEntry(30f, "Project Costs"));
                 pieEntries.add(new PieEntry(20f, "Personnel Costs"));
             }
-        } else if (currentType.equals("income")) {
+        } else if (currentType.equals("Income")) {
             pieEntries.add(new PieEntry(40f, "Salary"));
             pieEntries.add(new PieEntry(30f, "Investments"));
             pieEntries.add(new PieEntry(20f, "Freelancing"));
@@ -250,7 +250,7 @@ public class ChartFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
         boolean isPersonal = sharedPreferences.getBoolean("isPersonnal", false);
 
-        if (currentType.equals("expense")) {
+        if (currentType.equals("Expense")) {
             if (isPersonal) {
                 calendarItems.add(new CalendarItem("Ăn sáng", "expense",  50000 , R.drawable.ic_food));
                 calendarItems.add(new CalendarItem("Mỹ phẩm", "expense", 500000, R.drawable.ic_cosmetic));
@@ -262,7 +262,7 @@ public class ChartFragment extends Fragment {
                 calendarItems.add(new CalendarItem("Bảo trì", "expense", 4000000, R.drawable.ic_maintenance));
                 calendarItems.add(new CalendarItem("Dự án", "expense", 9000000, R.drawable.ic_project));
             }
-        } else if (currentType.equals("income")) {
+        } else if (currentType.equals("Income")) {
             if (isPersonal) {
                 calendarItems.add(new CalendarItem("Lương tháng 10", "income", 6000000, R.drawable.ic_salary));
                 calendarItems.add(new CalendarItem("Khác", "income", 1000000, R.drawable.ic_add));
