@@ -144,7 +144,12 @@ public class SignInActivity extends AppCompatActivity {
                 intent.putExtra("email", userData.getEmail());
                 intent.putExtra("userData", userData);
                 startActivity(intent);
+                Intent feedbackIntent = new Intent(SignInActivity.this, FeedbackActivity.class);
+                feedbackIntent.putExtra("username", userData.getUsername());
+                feedbackIntent.putExtra("email", userData.getEmail());
+                feedbackIntent.putExtra("userData", userData);
                 finish();
+
             }
         });
         builder.create().show();
