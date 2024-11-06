@@ -1,67 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearlayout"
     android:orientation="vertical">
 
+    <!-- Khung chứa nội dung của ứng dụng -->
     <FrameLayout
         android:id="@+id/frame_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="11">
+        android:layout_weight="1">
+        <!-- Nội dung sẽ được thay đổi dựa trên điều hướng -->
     </FrameLayout>
 
-    <LinearLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:background="#3682AE">
+        android:layout_height="60dp"
+        android:background="@color/color11"
+        app:tabGravity="fill"
+        app:tabMode="fixed" />
 
-        <ImageButton
-            android:id="@+id/ib_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Home"
-            android:src="@drawable/home_with_size" /> <!-- Thêm contentDescription -->
-
-        <ImageButton
-            android:id="@+id/ib_calendar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Calendar"
-            android:src="@drawable/calendar_with_size" /> <!-- Thêm contentDescription -->
-
-        <ImageButton
-            android:id="@+id/ib_insert"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Insert"
-            android:src="@drawable/insert_with_size" /> <!-- Thêm contentDescription -->
-
-        <ImageButton
-            android:id="@+id/ib_chart"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Chart"
-            android:src="@drawable/chart_with_size" /> <!-- Thêm contentDescription -->
-
-        <ImageButton
-            android:id="@+id/ib_setting"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:contentDescription="Setting"
-            android:src="@drawable/setting_with_size" /> <!-- Thêm contentDescription -->
-
-    </LinearLayout>
 </LinearLayout>

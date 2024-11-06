@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -98,6 +100,7 @@ public class CalendarFragment extends Fragment {
             }
         });
 
+
         // Thiết lập sự kiện khi nhấn vào ImageButton
         ibInsert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,6 +129,15 @@ public class CalendarFragment extends Fragment {
         CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
         lvShowInsert.setAdapter(adapter);
 
+        lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                ShowChooseEdit_Delete();
+                return false;
+            }
+        });
+
 
         return view;
     }
@@ -133,5 +145,22 @@ public class CalendarFragment extends Fragment {
     private void updateDisplayedDate(int day, int month, int year) {
         String formattedDate = String.format(Locale.ENGLISH, "Date: %02d/%02d/%04d", day, month, year);
         tvShowDay.setText(formattedDate);
+    }
+    private void ShowChooseEdit_Delete(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Edit or Delete");
+        // Xử lý sự kiện khi người dùng chọn Edit
+
+        builder.setPositiveButton("Edit", (dialog, which) -> {
+            //Sự kiện sửa
+
+        });
+        // Xử lý sự kiện khi người dùng chọn Delete
+        builder.setNegativeButton("Delete", (dialog, which) -> {
+
+        });
+        // Hiển thị dialog
+        builder.create().show();
     }
 }

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -102,6 +103,15 @@ public class ChartFragment extends Fragment {
         List<CalendarItem> calendarItems = new ArrayList<>();
 
         updateListView(lv_chart);
+
+        lv_chart.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                ShowChooseEdit_Delete();
+                return false;
+            }
+        });
 
         return view;
     }
@@ -267,6 +277,26 @@ public class ChartFragment extends Fragment {
         CalendarAdapter adapterlv = new CalendarAdapter(getContext(), calendarItems);
         lv_chart.setAdapter(adapterlv);
         adapterlv.notifyDataSetChanged();
+
+
+    }
+
+    private void ShowChooseEdit_Delete(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Edit or Delete");
+        // Xử lý sự kiện khi người dùng chọn Edit
+
+        builder.setPositiveButton("Edit", (dialog, which) -> {
+            //Sự kiện sửa
+
+        });
+        // Xử lý sự kiện khi người dùng chọn Delete
+        builder.setNegativeButton("Delete", (dialog, which) -> {
+
+        });
+        // Hiển thị dialog
+        builder.create().show();
     }
 
 }
