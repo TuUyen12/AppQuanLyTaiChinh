@@ -7,6 +7,6 @@
         android:height="400dp" />
     <corners android:radius="10dp" />
 
-    <stroke android:color="@color/black"
+    <stroke android:color="@color/my_light_primary"
         android:width="3dp" />
 </shape>
