@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -23,6 +23,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.example.quanlytaichinh.CalendarAdapter;
+import com.example.quanlytaichinh.CalendarItem;
+import com.example.quanlytaichinh.CustomSpinnerAdapter;
+import com.example.quanlytaichinh.R;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
@@ -248,36 +252,7 @@ public class ChartFragment extends Fragment {
         List<CalendarItem> calendarItems = new ArrayList<>();
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonnal", false);
-
-        if (currentType.equals("Expense")) {
-            if (isPersonal) {
-                calendarItems.add(new CalendarItem("Ăn sáng", "expense",  50000 , R.drawable.ic_food));
-                calendarItems.add(new CalendarItem("Mỹ phẩm", "expense", 500000, R.drawable.ic_cosmetic));
-                calendarItems.add(new CalendarItem("Ăn trưa", "expense", 40000, R.drawable.ic_food));
-                calendarItems.add(new CalendarItem("Tài liệu", "expense", 20000, R.drawable.ic_edu));
-                calendarItems.add(new CalendarItem("Khác", "expense", 100000, R.drawable.ic_add));
-            } else {
-                calendarItems.add(new CalendarItem("Quảng cáo", "expense", 3000000, R.drawable.ic_marketing));
-                calendarItems.add(new CalendarItem("Bảo trì", "expense", 4000000, R.drawable.ic_maintenance));
-                calendarItems.add(new CalendarItem("Dự án", "expense", 9000000, R.drawable.ic_project));
-            }
-        } else if (currentType.equals("Income")) {
-            if (isPersonal) {
-                calendarItems.add(new CalendarItem("Lương tháng 10", "income", 6000000, R.drawable.ic_salary));
-                calendarItems.add(new CalendarItem("Khác", "income", 1000000, R.drawable.ic_add));
-            } else {
-                calendarItems.add(new CalendarItem("Lương", "income", 4000000, R.drawable.ic_salary));
-                calendarItems.add(new CalendarItem("Khác", "income", 1000000, R.drawable.ic_add));
-                calendarItems.add(new CalendarItem("Thu nhập", "income", 5000000, R.drawable.ic_investment));
-            }
-        }
-
-        // Thiết lập adapter cho ListView
-        CalendarAdapter adapterlv = new CalendarAdapter(getContext(), calendarItems);
-        lv_chart.setAdapter(adapterlv);
-        adapterlv.notifyDataSetChanged();
-
+        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
 
     }
 

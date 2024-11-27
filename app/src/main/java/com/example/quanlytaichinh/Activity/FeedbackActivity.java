@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Activity;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -6,14 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class FeedbackActivity extends AppCompatActivity {
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.R;
 
-    UserData userData;
+public class FeedbackActivity extends AppCompatActivity {
+    private DTBase.User authUser;
     private EditText feedbackEditText;
 
     @Override
@@ -31,15 +32,16 @@ public class FeedbackActivity extends AppCompatActivity {
                 if (feedback.isEmpty()) {
                     Toast.makeText(FeedbackActivity.this, "Please enter your feedback!", Toast.LENGTH_SHORT).show();
                 } else {
-                    sendFeedbackEmail(feedback, userData.getId());
+                    sendFeedbackEmail(feedback, authUser.getUserID());
                 }
             }
         });
-        userData = (UserData) getIntent().getSerializableExtra("userData");
+        // Nhận từ Intent
+        authUser = (DTBase.User) getIntent().getSerializableExtra("User");
 
     }
 
-    private void sendFeedbackEmail(String feedback, String userId) {
+    private void sendFeedbackEmail(String feedback, int userId) {
         String recipientEmail = "financialmanagementapp2024@gmail.com";  // Địa chỉ email nhận phản hồi
         // Tiêu đề email
 

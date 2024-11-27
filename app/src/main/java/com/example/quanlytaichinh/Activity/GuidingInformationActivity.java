@@ -1,8 +1,10 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.quanlytaichinh.R;
 
 public class GuidingInformationActivity extends AppCompatActivity {
 

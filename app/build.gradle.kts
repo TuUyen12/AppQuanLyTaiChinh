@@ -48,10 +48,11 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     // Firebase dependencies
-    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
 
     // Material Design
     implementation("com.google.android.material:material:1.7.0")
@@ -64,5 +65,9 @@ dependencies {
 
     // Material Date Pickers
     implementation ("com.google.android.material:material:1.8.0")
+
+    //JSON
+    implementation ("com.google.code.gson:gson:2.8.8")
+
 
 }

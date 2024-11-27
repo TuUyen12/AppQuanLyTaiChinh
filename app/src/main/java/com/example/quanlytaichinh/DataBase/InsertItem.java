@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.DataBase;
 
 public class InsertItem {
     private int id; // ID danh mục

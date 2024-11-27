@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -21,6 +21,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.quanlytaichinh.CalendarAdapter;
+import com.example.quanlytaichinh.CalendarItem;
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.R;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
@@ -36,6 +40,7 @@ public class CalendarFragment extends Fragment {
     ImageButton ibInsert;
     TextView tvShowDay;
     ListView lvShowInsert;
+    DTBase.User authUser;
 
     // Biến lưu trữ ngày đã chọn
     private int selectedYear = -1;
@@ -52,8 +57,12 @@ public class CalendarFragment extends Fragment {
         config.setLocale(locale);
         getActivity().getResources().updateConfiguration(config, null);
 
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.calendar_layout, container, false);
+        // Nhận dữ liệu từ Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            authUser = (DTBase.User) bundle.getSerializable("User"); // Ép kiểu về User
+        }
 
         calendarView = view.findViewById(R.id.calendarView);
         ibInsert = view.findViewById(R.id.ib_insert);
@@ -64,19 +73,9 @@ public class CalendarFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
         // Lấy giá trị của `isPersonnal`
-        boolean isPersonnal = sharedPreferences.getBoolean("isPersonnal", false);
-        List<CalendarItem> calendarItems = new ArrayList<>();
-        if (isPersonnal) {
-            calendarItems.add(new CalendarItem("Ăn sáng", "expense", 50000, R.drawable.ic_food));
-            calendarItems.add(new CalendarItem("Lương tháng 10", "income", 6000000, R.drawable.ic_salary));
-            calendarItems.add(new CalendarItem("Mỹ phẩm", "expense", 500000, R.drawable.ic_cosmetic));
-            calendarItems.add(new CalendarItem("Ăn trưa", "expense", 40000, R.drawable.ic_food));
-            calendarItems.add(new CalendarItem("Tài liệu", "expense", 20000, R.drawable.ic_edu));
-        } else {
-            calendarItems.add(new CalendarItem("Quảng cáo", "expense", 3000000, R.drawable.ic_marketing));
-            calendarItems.add(new CalendarItem("Bảo trì", "expense", 4000000, R.drawable.ic_maintenance));
-            calendarItems.add(new CalendarItem("Dự án", "expense", 9000000, R.drawable.ic_project));
-        }
+        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
+        List<DTBase.Financial> calendarItems = new ArrayList<>();
+
 
         // Lấy ngày hiện tại khi mở app lên
         Calendar currentDate = Calendar.getInstance();
@@ -126,7 +125,8 @@ public class CalendarFragment extends Fragment {
         });
 
         // Thiết lập adapter cho ListView
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems, authUser);
+
         lvShowInsert.setAdapter(adapter);
 
         lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

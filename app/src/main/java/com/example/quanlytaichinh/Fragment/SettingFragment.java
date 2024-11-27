@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,11 +13,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.quanlytaichinh.Activity.FeedbackActivity;
+import com.example.quanlytaichinh.Activity.GuidingInformationActivity;
+import com.example.quanlytaichinh.Activity.TimeSettingActivity;
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.R;
+import com.example.quanlytaichinh.SettingAdapter;
+import com.example.quanlytaichinh.SettingItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class SettingFragment extends Fragment {
-    private UserData user;
+
+    private DTBase.User authUser;
 
     @Nullable
     @Override
@@ -29,33 +38,33 @@ public class SettingFragment extends Fragment {
 
         // Thiết lập sự kiện click cho RelativeLayout
         accountLayout.setOnClickListener(v -> {
-            // Chuyển đến AccountFragment
             AccountFragment accountFragment = new AccountFragment();
 
-            // Truyền dữ liệu vào Bundle
+            // Truyền authUser qua Bundle
             Bundle bundle = new Bundle();
-            if (user != null) {
-                bundle.putSerializable("userData", user); // Chuyển đối tượng UserData
+            if (authUser != null) {
+                bundle.putSerializable("User", authUser);
             }
-            accountFragment.setArguments(bundle); // Gán Bundle vào Fragment
+            accountFragment.setArguments(bundle);
 
             // Thay thế Fragment
             getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, accountFragment) // Đảm bảo bạn đang thay thế bằng Fragment
+                    .replace(R.id.frame_layout, accountFragment)
                     .addToBackStack(null)
                     .commit();
         });
 
-
         // Nhận dữ liệu từ Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
-            user = (UserData) bundle.getSerializable("userData"); // Nhận đối tượng UserData
-            if (user != null) {
-                TextView tv_account = accountLayout.findViewById(R.id.tv_account);
-                tv_account.setText(user.getEmail()); // Hiển thị email từ UserData
+            authUser = (DTBase.User) bundle.getSerializable("User"); // Ép kiểu về User
+
+            if (authUser != null) {
+                TextView tv_account = view.findViewById(R.id.tv_account);
+                tv_account.setText(authUser.getUserMail()); // Hiển thị email
             }
         }
+
 
         ListView lvSetting = view.findViewById(R.id.lv_setting);
 

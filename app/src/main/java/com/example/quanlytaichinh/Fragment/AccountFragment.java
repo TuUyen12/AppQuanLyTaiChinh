@@ -1,4 +1,4 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 
+import com.example.quanlytaichinh.Activity.ChangePasswordActivity;
+import com.example.quanlytaichinh.Activity.InfoAccountActivity;
+import com.example.quanlytaichinh.Activity.SignInActivity;
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AccountFragment extends Fragment {
@@ -23,7 +27,7 @@ public class AccountFragment extends Fragment {
     private Button btn_change_password;
     private Button btn_sign_out;
     private FirebaseAuth mAuth;// Thêm biến FirebaseAuth
-    private UserData user;
+    private DTBase.User authUser;
 
     @Nullable
     @Override
@@ -37,14 +41,12 @@ public class AccountFragment extends Fragment {
         // Khởi tạo FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 
-        // Nhận dữ liệu từ Bundle
+        // Nhận Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
-            user = (UserData) bundle.getSerializable("userData"); // Nhận đối tượng UserData
-            if (user != null) {
-                // Hiển thị thông tin người dùng nếu cần
-                TextView tv_email = view.findViewById(R.id.tv_id);
-                tv_email.setText(user.getId());
+            authUser = (DTBase.User) bundle.getSerializable("User");
+            if (authUser != null) {
+
             }
         }
 
@@ -52,8 +54,8 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), InfoAccountActivity.class);
-                if (user != null) {
-                    intent.putExtra("userData", user); // Truyền đối tượng UserData
+                if (authUser != null) {
+                    intent.putExtra("User", authUser); // Truyền đối tượng UserData
                 }
                 startActivity(intent);
             }

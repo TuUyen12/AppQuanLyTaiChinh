@@ -1,14 +1,21 @@
-package com.example.quanlytaichinh;
+package com.example.quanlytaichinh.Activity;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import com.example.quanlytaichinh.Fragment.CalendarFragment;
+import com.example.quanlytaichinh.Fragment.ChartFragment;
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.Fragment.HomeFragment;
+import com.example.quanlytaichinh.Fragment.InsertFragment;
+import com.example.quanlytaichinh.R;
+import com.example.quanlytaichinh.Fragment.SettingFragment;
 import com.google.android.material.tabs.TabLayout;
 
 public class GeneralActivity extends AppCompatActivity {
     private boolean isHome = true; // Biến để theo dõi trạng thái của HomeFragment
+    private DTBase.User authUser; // Đối tượng User để lưu thông tin người dùng
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +34,8 @@ public class GeneralActivity extends AppCompatActivity {
         // Hiển thị HomeFragment mặc định khi đăng nhập
         showFragment(new HomeFragment());
 
-        // Nhận dữ liệu từ Intent
-        String username = getIntent().getStringExtra("username");
-        String email = getIntent().getStringExtra("email");
-        UserData userData = (UserData) getIntent().getSerializableExtra("userData");
+        // Nhận từ Intent
+        authUser = (DTBase.User) getIntent().getSerializableExtra("User");
 
         // Lắng nghe sự kiện khi một tab được chọn
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -47,21 +52,27 @@ public class GeneralActivity extends AppCompatActivity {
                         break;
                     case 2:
                         selectedFragment = new InsertFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("User", authUser);
+                        selectedFragment.setArguments(bundle);
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, selectedFragment)
+                                .commit();
                         break;
                     case 3:
                         selectedFragment = new ChartFragment();
                         break;
                     case 4:
                         // Tạo đối tượng SettingFragment và truyền dữ liệu
+                        // Truyền vào Fragment
                         SettingFragment settingFragment = new SettingFragment();
-                        // Truyền dữ liệu vào Bundle
-                        Bundle bundle = new Bundle();
-                        bundle.putString("username", username);
-                        bundle.putString("email", email);
-                        bundle.putSerializable("userData", userData);
-                        // Đặt Bundle vào Fragment
-                        settingFragment.setArguments(bundle);
-                        selectedFragment = settingFragment;
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putSerializable("User", authUser);
+                        settingFragment.setArguments(bundle1);
+
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, settingFragment)
+                                .commit();
                         break;
                 }
 

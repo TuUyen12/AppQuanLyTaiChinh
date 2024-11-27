@@ -1,7 +1,6 @@
 package com.example.quanlytaichinh;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,15 +8,18 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.quanlytaichinh.DataBase.DTBase;
+import com.example.quanlytaichinh.DataBase.InsertItem;
+
 import java.util.ArrayList;
 
 public class InsertAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<InsertItem> gridItems;
+    private ArrayList<DTBase.Category> gridItems;
     private int selectedPosition = -1;
 
-    public InsertAdapter(Context context, ArrayList<InsertItem> gridItems) {
+    public InsertAdapter(Context context, ArrayList<DTBase.Category> gridItems) {
         this.context = context;
         this.gridItems = gridItems;
     }
@@ -46,9 +48,9 @@ public class InsertAdapter extends BaseAdapter {
         ImageView imageView = convertView.findViewById(R.id.iv_item);
         TextView textView = convertView.findViewById(R.id.tv_item);
 
-        InsertItem gridItem = gridItems.get(position);
-        imageView.setImageResource(gridItem.getImageResId());
-        textView.setText(gridItem.getTitle());
+        DTBase.Category gridItem = gridItems.get(position);
+        imageView.setImageResource(gridItem.getCategoryIcon());
+        textView.setText(gridItem.getCategoryName());
 
         // Áp dụng background dựa trên vị trí đã chọn
         if (position == selectedPosition) {
