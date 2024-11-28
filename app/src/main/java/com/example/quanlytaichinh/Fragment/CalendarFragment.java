@@ -2,6 +2,7 @@ package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -25,10 +26,13 @@ import com.example.quanlytaichinh.CalendarAdapter;
 import com.example.quanlytaichinh.CalendarItem;
 import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -47,6 +51,8 @@ public class CalendarFragment extends Fragment {
     private int selectedMonth = -1;
     private int selectedDay = -1;
 
+    private Context context;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,12 +64,14 @@ public class CalendarFragment extends Fragment {
         getActivity().getResources().updateConfiguration(config, null);
 
         View view = inflater.inflate(R.layout.calendar_layout, container, false);
+
         // Nhận dữ liệu từ Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
             authUser = (DTBase.User) bundle.getSerializable("User"); // Ép kiểu về User
         }
 
+        // Ánh xạ các thành phần giao diện
         calendarView = view.findViewById(R.id.calendarView);
         ibInsert = view.findViewById(R.id.ib_insert);
         tvShowDay = view.findViewById(R.id.tv_show_day);
@@ -72,10 +80,34 @@ public class CalendarFragment extends Fragment {
         // Khởi tạo SharedPreferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
-        // Lấy giá trị của `isPersonnal`
+        // Lấy giá trị của `isPersonal`
         boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
         List<DTBase.Financial> calendarItems = new ArrayList<>();
 
+        // Lấy dữ liệu tài chính từ SharedPreferences
+        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+        String financialJson = financialSharedPreferences.getString("financialList", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([]);
+        if (financialJson != null) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            calendarItems = gson.fromJson(financialJson, type);
+            for (DTBase.Financial financial : calendarItems) {
+                System.out.println(financial.getFinancialID());
+            }
+        }
+
+        // Thiết lập adapter cho ListView
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+        lvShowInsert.setAdapter(adapter);
+
+        // Sự kiện khi nhấn giữ vào một mục trong ListView
+        lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ShowChooseEdit_Delete();
+                return false;
+            }
+        });
 
         // Lấy ngày hiện tại khi mở app lên
         Calendar currentDate = Calendar.getInstance();
@@ -98,7 +130,6 @@ public class CalendarFragment extends Fragment {
                 updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
             }
         });
-
 
         // Thiết lập sự kiện khi nhấn vào ImageButton
         ibInsert.setOnClickListener(new View.OnClickListener() {
@@ -124,43 +155,32 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        // Thiết lập adapter cho ListView
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems, authUser);
-
-        lvShowInsert.setAdapter(adapter);
-
-        lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                ShowChooseEdit_Delete();
-                return false;
-            }
-        });
-
-
         return view;
     }
 
+    // Hàm cập nhật ngày được hiển thị trên TextView
     private void updateDisplayedDate(int day, int month, int year) {
         String formattedDate = String.format(Locale.ENGLISH, "Date: %02d/%02d/%04d", day, month, year);
         tvShowDay.setText(formattedDate);
     }
-    private void ShowChooseEdit_Delete(){
 
+    // Hàm xử lý sự kiện chọn Edit hoặc Delete
+    private void ShowChooseEdit_Delete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit or Delete");
+
         // Xử lý sự kiện khi người dùng chọn Edit
-
         builder.setPositiveButton("Edit", (dialog, which) -> {
-            //Sự kiện sửa
-
+            // Sự kiện sửa
         });
+
         // Xử lý sự kiện khi người dùng chọn Delete
         builder.setNegativeButton("Delete", (dialog, which) -> {
-
+            // Sự kiện xóa
         });
+
         // Hiển thị dialog
         builder.create().show();
     }
+
 }

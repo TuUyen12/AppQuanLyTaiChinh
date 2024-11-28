@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -100,21 +101,43 @@ public class SignInActivity extends AppCompatActivity {
                 Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                 authUser = MyUser;
                 userId = MyUser.getUserID();
-                // Lưu thông tin tài chính cho người dùng (danh sách Financial)
-                userFinancialList.clear(); // Đảm bảo danh sách trước đó bị xóa
 
-                if (financialData != null) {
-                    for (Financial financial : financialData) {
-                        userFinancialList.add(financial); // Thêm vào danh sách tài chính của người dùng
+                // Xóa danh sách tài chính trước đó
+                userFinancialList.clear();
+
+                // Lấy dữ liệu tài chính từ Firebase
+                database.fetchFinancialData(userId, new DTBase.FinancialCallback() {
+                    @Override
+                    public void onFinancialDataFetched(List<Financial> financialList) {
+                        if (financialList != null) {
+                            userFinancialList.addAll(financialList);
+
+                            // Khi dữ liệu tài chính đã tải xong, lưu vào SharedPreferences
+                            SharedPreferences sharedPreferences = getSharedPreferences("MyFinancials", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            Gson gson = new Gson();
+                            String json = gson.toJson(userFinancialList);
+                            editor.putString("financialList", json);
+                            editor.apply();
+                        }
                     }
-                }
-                // Hiển thị dialog chọn loại tài khoản hoặc tiếp tục điều hướng tới màn hình chính
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        // Xử lý lỗi khi không thể lấy dữ liệu tài chính
+                        Toast.makeText(SignInActivity.this, "Error fetching financial data: " + errorMessage, Toast.LENGTH_SHORT).show();
+                        Log.e("SignInActivity", "Error: " + errorMessage);
+                    }
+                });
+
+                // Hiển thị dialog chọn loại tài khoản hoặc điều hướng
                 showAccountTypeDialog();
+
             } else {
+                // Thông báo lỗi
                 Toast.makeText(SignInActivity.this, "Invalid username or password!", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     // Hàm hiển thị dialog cho người dùng chọn loại tài khoản và lưu vào SharedPreferences
@@ -148,6 +171,7 @@ public class SignInActivity extends AppCompatActivity {
                 Category = new ArrayList<>();
                 // Gọi phương thức initCategory để lấy dữ liệu từ Firebase
                 initCategory(userId, isPersonal);
+
 
 
                 // Chuyển `authUser` sang `GeneralActivity` sau khi đã lưu loại tài khoản

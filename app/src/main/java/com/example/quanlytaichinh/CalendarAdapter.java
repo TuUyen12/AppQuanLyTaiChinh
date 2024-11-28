@@ -25,12 +25,10 @@ public class CalendarAdapter extends BaseAdapter {
     private Context context;
     private List<DTBase.Financial> itemList;
     private ArrayList<DTBase.Category> category;
-    private DTBase.User authUser;
 
-    public CalendarAdapter(Context context, List<DTBase.Financial> itemList, DTBase.User authUser) {
+    public CalendarAdapter(Context context, List<DTBase.Financial> itemList) {
         this.context = context;
         this.itemList = itemList;
-        this.authUser = authUser;
 
         // Lấy danh sách Category từ SharedPreferences
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyCategory", MODE_PRIVATE);
@@ -38,6 +36,7 @@ public class CalendarAdapter extends BaseAdapter {
         Gson gson = new Gson();
         Type categoryListType = new TypeToken<ArrayList<DTBase.Category>>() {}.getType();
         this.category = gson.fromJson(categoryJson, categoryListType);
+
     }
 
     @Override
@@ -68,8 +67,6 @@ public class CalendarAdapter extends BaseAdapter {
         TextView tvNote = convertView.findViewById(R.id.tv_note); // title
         TextView tvMoney = convertView.findViewById(R.id.tv_money);
 
-
-
         // Hiển thị categoryType trong tv_item
         tvItem.setText(currentItem.getFinancialType());
 
@@ -81,6 +78,15 @@ public class CalendarAdapter extends BaseAdapter {
         String formattedAmount = NumberFormat.getCurrencyInstance(vietnamLocale).format(currentItem.getFinancialAmount());
         tvMoney.setText(formattedAmount);
 
+        // Tìm kiếm Category tương ứng với categoryId của Financial
+        for (DTBase.Category cat : category) {
+            if (cat.getCategoryID() == currentItem.getCategoryID()) {
+                ivItem.setImageResource(cat.getCategoryIcon()); // Gán categoryIcon vào ImageView
+                break;
+            }
+        }
+
         return convertView;
     }
+
 }

@@ -1,9 +1,12 @@
 package com.example.quanlytaichinh.DataBase;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.quanlytaichinh.Activity.SignInActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -76,6 +79,10 @@ public class DTBase {
                                 public void onFinancialDataFetched(List<Financial> financialList) {
                                     // Trả về cả user và danh sách financials
                                     callback.onSignInResult(true, user, financialList);
+                                }
+                                @Override
+                                public void onError(String errorMessage) {
+
                                 }
                             });
                             return;
@@ -314,6 +321,10 @@ public class DTBase {
                                         // Xử lý dữ liệu đã lấy được sau khi cập nhật
                                         System.out.println("Fetched financial data: " + financialList);
                                     }
+                                    @Override
+                                    public void onError(String errorMessage) {
+                                        System.out.println("Failed to fetch financial data: " + errorMessage);
+                                    }
                                 });
 
                             } else {
@@ -356,7 +367,9 @@ public class DTBase {
     // Interface callback cho việc lấy dữ liệu financial
     public interface FinancialCallback {
         void onFinancialDataFetched(List<Financial> financialList);
+        void onError(String errorMessage);
     }
+
 
 
     public void addNewCategory(Category category, int userId, int categoryId) {

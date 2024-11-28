@@ -168,6 +168,25 @@ public class InsertFragment extends Fragment {
                         DTBase db = new DTBase();
                         db.addFinancialForUser(newFinancial, userId);
 
+                        // Lấy dữ liệu tài chính từ SharedPreferences
+                        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+                        String financialJson = financialSharedPreferences.getString("financialList", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu
+
+                        // Chuyển đổi chuỗi JSON thành danh sách các mục tài chính
+                        Gson gson = new Gson();
+                        Type type = new TypeToken<List<DTBase.Financial>>() {
+                        }.getType();
+                        List<DTBase.Financial> financialList = gson.fromJson(financialJson, type);
+
+                        // Thêm đối tượng tài chính mới vào danh sách
+                        financialList.add(newFinancial);
+
+                        // Cập nhật lại SharedPreferences với danh sách mới
+                        SharedPreferences.Editor editor = financialSharedPreferences.edit();
+                        String updatedJson = gson.toJson(financialList); // Chuyển danh sách thành chuỗi JSON
+                        editor.putString("financialList", updatedJson); // Lưu chuỗi JSON vào SharedPreferences
+                        editor.apply(); // Áp dụng thay đổi
+
                         // Hiển thị thông báo thành công
                         Toast.makeText(getActivity(), "Financial data submitted successfully!", Toast.LENGTH_SHORT).show();
 
@@ -192,7 +211,7 @@ public class InsertFragment extends Fragment {
         return view;
     }
 
-    private void loadCategoriesFromPreferences() {
+        private void loadCategoriesFromPreferences() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
         String expenseJson = sharedPreferences.getString("expense", "[]");  // Mặc định là mảng rỗng nếu không có giá trị
         String incomeJson = sharedPreferences.getString("income", "[]");    // Mặc định là mảng rỗng nếu không có giá trị
