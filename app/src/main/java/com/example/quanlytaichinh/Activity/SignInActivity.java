@@ -220,6 +220,7 @@ public class SignInActivity extends AppCompatActivity {
                 String incomeJson = gson.toJson(income);
                 String categoryJson = gson.toJson(Category);
 
+
                 // Lưu các chuỗi JSON vào SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("MyCategory", MODE_PRIVATE);
                 SharedPreferences.Editor categoryEditor = sharedPreferences.edit();

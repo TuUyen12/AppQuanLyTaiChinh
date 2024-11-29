@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.quanlytaichinh.CustomSpinnerAdapter;
+import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -31,12 +33,19 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
 import android.content.SharedPreferences;
 import android.content.Context;
 
+import java.lang.reflect.Type;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
@@ -46,6 +55,9 @@ public class HomeFragment extends Fragment {
     private static final String PREFS_NAME_YEAR = "SpinnerYear";
     private static final String KEY_SELECTED_YEAR = "SelectedYear";
 
+    private boolean isPersonal;
+    private String categoryJson;
+    private String financialJson;
 
     @Nullable
     @Override
@@ -53,18 +65,51 @@ public class HomeFragment extends Fragment {
         // Inflate layout cho fragment này
         View view = inflater.inflate(R.layout.home_layout, container, false);
 
+        // Khởi tạo SharedPreferences để lấy dữ liệu isPersonal
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        isPersonal = sharedPreferences.getBoolean("isPersonal", false);
+
+        // Khởi tạo SharedPreferences để lấy dữ liệu category
+        SharedPreferences categorySharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
+        categoryJson = categorySharedPreferences.getString("category", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([])
+
+        // Khởi tạo SharedPreferences để lấy dữ liệu financial
+        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+        financialJson = financialSharedPreferences.getString("financialList", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([])
+
+
         // TextView để hiển thị số dư
         TextView textViewMoney = view.findViewById(R.id.tv_balance);
-        double amount = 5000000; // Giả sử số tiền
+
+        boolean[] isNegative = new boolean[1];  // Dùng mảng để truyền giá trị
+        double amount = (double) getTotalBalance(isNegative);
+
+        // Kiểm tra trạng thái âm
+        if (isNegative[0]) {
+            // Số dư là âm
+            Log.d("BalanceStatus", "The balance is negative.");
+        } else {
+            // Số dư là dương
+            Log.d("BalanceStatus", "The balance is positive.");
+        }
 
         // Định dạng tiền tệ Việt Nam
         Locale vietnamLocale = new Locale("vi", "VN");
         String formattedAmount = NumberFormat.getCurrencyInstance(vietnamLocale).format(amount);
+
+        // Nếu số dư là âm, thêm dấu "-" trước số tiền
+        if (isNegative[0]) {
+            formattedAmount = "-" + formattedAmount.replace("₫", "").trim(); // Xóa dấu "₫" và thêm dấu "-"
+        }
+
+        // Ẩn số tiền mặc định
         textViewMoney.setText("**** đ"); // Ẩn số tiền mặc định
 
+        // Chức năng hiển thị/ẩn số tiền khi nhấn vào biểu tượng mắt
         ImageButton ib_eye = view.findViewById(R.id.ib_eye);
         final boolean[] isShowingAmount = {false}; // Ẩn ban đầu
 
+        String finalFormattedAmount = formattedAmount;
         ib_eye.setOnClickListener(v -> {
             if (isShowingAmount[0]) {
                 isShowingAmount[0] = false;
@@ -73,9 +118,10 @@ public class HomeFragment extends Fragment {
             } else {
                 isShowingAmount[0] = true;
                 ib_eye.setImageResource(R.drawable.show_with_size1);
-                textViewMoney.setText(formattedAmount); // Hiển thị số tiền
+                textViewMoney.setText(finalFormattedAmount); // Hiển thị số tiền
             }
         });
+
         //Thiết lập spinner chọn khoảng thời gian cho biểu đồ chi phí và thu nhập
 
         Spinner spinnerDuration = view.findViewById(R.id.spinner_duration);
@@ -140,8 +186,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
-
         // Thiết lập PieChart
         PieChart pieChart = view.findViewById(R.id.pieChart);
         setupPieChart(pieChart, getUserPieData());
@@ -149,7 +193,9 @@ public class HomeFragment extends Fragment {
 
         // Thiết lập BarChart chi phí và thu nhập
         BarChart barChart = view.findViewById(R.id.barChart);
-        setupBarChartExpenseIncome(barChart);
+        ArrayList<BarEntry> userBarEntries = getUserBarExpenseIncome();
+        setupBarChartExpenseIncome(barChart, userBarEntries);
+
 
         // Thiết lập BarChart tài chính với dữ liệu tùy chỉnh
         BarChart barChartFinancial = view.findViewById(R.id.barChart_financial);
@@ -159,7 +205,153 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    // Hàm thiết lập PieChart
+    // Hàm lấy dữ liệu tổng số tiền hiện có
+    private double getTotalBalance(boolean[] isNegative) {
+        Gson gson = new Gson();
+        double expense = 0.0;
+        double income = 0.0;
+        double amount;
+
+        if (financialJson != null) {
+            // Chuyển đổi financialJson thành danh sách các đối tượng Financial
+            Type listType = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, listType);
+
+            // Duyệt qua từng phần tử Financial
+            for (DTBase.Financial financial : financialList) {
+                if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
+                    if (isPersonal && financial.getCategoryID() < 20) {
+                        expense += financial.getFinancialAmount();
+                    } else if (!isPersonal && financial.getCategoryID() >= 20) {
+                        expense += financial.getFinancialAmount();
+                    }
+                }
+                else if ("income".equalsIgnoreCase(financial.getFinancialType())) {
+                    if (isPersonal && financial.getCategoryID() < 20) {
+                        income += financial.getFinancialAmount();
+                    } else if (!isPersonal && financial.getCategoryID() >= 20) {
+                        income += financial.getFinancialAmount();
+                    }
+                }
+            }
+
+            Log.d("TotalAmount", "Total Expense: " + expense + ", Total Income: " + income);
+
+        }
+        Log.d("TotalAmount", "Total Expense: " + expense + ", Total Income: " + income);
+
+
+        // Kiểm tra nếu tổng số dư âm
+        if (expense > income) {
+            amount = expense - income;
+            isNegative[0] = true; // Đánh dấu là số âm
+            Log.d("TotalAmount", " - " + amount);
+        } else {
+            amount = income - expense;
+            isNegative[0] = false; // Đánh dấu là số dương
+            Log.d("TotalAmount", "" + amount);
+        }
+        Log.d("CalculatedAmount", "Calculated Amount: " + amount);
+        return amount;  // Trả về tổng số dư dưới dạng double
+    }
+
+    //Thêm dữ liệu cho BarChart
+    private ArrayList<BarEntry> getUserBarExpenseIncome(){
+        // Danh sách PieEntry để trả về 2 cột expense và income
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        Gson gson = new Gson();
+        if (financialJson != null) {
+            // Sử dụng Gson để chuyển JSON thành danh sách các đối tượng Financial
+            Type financialType = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, financialType);
+
+            // Biến để lưu tổng expense và income
+            double totalExpense = 0.0;
+            double totalIncome = 0.0;
+
+            // Duyệt qua từng phần tử Financial
+            for (DTBase.Financial financial : financialList) {
+                if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
+                    // Kiểm tra điều kiện là cá nhân hoặc không phải cá nhân
+                    if (isPersonal) {
+                        // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
+                        if (financial.getCategoryID() < 20) {
+                            totalExpense += financial.getFinancialAmount();
+                        }
+                    } else {
+                        // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
+                        if (financial.getCategoryID() >= 20) {
+                            totalExpense += financial.getFinancialAmount();
+                        }
+                    }
+                }
+                else if ("income".equalsIgnoreCase(financial.getFinancialType())) {
+                    // Tương tự cho income
+                    if (isPersonal) {
+                        if (financial.getCategoryID() < 20) {
+                            totalIncome += financial.getFinancialAmount();
+                        }
+                    } else {
+                        if (financial.getCategoryID() >= 20) {
+                            totalIncome += financial.getFinancialAmount();
+                        }
+                    }
+                }
+            }
+
+            // Thêm các giá trị vào BarEntry (cột 0 là expense, cột 1 là income)
+            barEntries.add(new BarEntry(0, (float)totalExpense)); // Expense
+            barEntries.add(new BarEntry(1, (float)totalIncome)); // Income
+        }
+
+        // Trả về danh sách BarEntry
+        return barEntries;
+    }
+
+    // Hàm thiết lập BarChart với hai cột: chi phí và thu nhập
+    private void setupBarChartExpenseIncome(BarChart barChart, ArrayList<BarEntry> userBarEntries) {
+
+        // Tạo BarDataSet từ userBarEntries
+        BarDataSet barDataSet = new BarDataSet(userBarEntries, "Financial Overview");
+        barDataSet.setColors(
+                getResources().getColor(R.color.color5), // Expense
+                getResources().getColor(R.color.color6)  // Income
+        );
+        barDataSet.setValueTextSize(12f);
+        barDataSet.setValueTextColor(getResources().getColor(R.color.black));
+
+        // Thiết lập BarData
+        BarData barData = new BarData(barDataSet);
+        barData.setBarWidth(0.8f); // Độ rộng của cột
+
+        // Cấu hình BarChart
+        barChart.setData(barData);
+        barChart.getDescription().setEnabled(false); // Tắt mô tả
+        barChart.getLegend().setEnabled(true); // Hiển thị chú thích
+        barChart.getXAxis().setGranularity(1f); // Đảm bảo các giá trị x được hiển thị cách đều
+        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM); // Trục X ở dưới cùng
+
+        // Gắn nhãn trục X (expense và income)
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(new String[]{"Expense", "Income"}));
+
+        YAxis leftAxis = barChart.getAxisLeft();
+        YAxis rightAxis = barChart.getAxisRight();
+
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setGranularity(1f); // Hoặc giá trị khác tùy theo độ lớn của dữ liệu
+
+        leftAxis.setEnabled(false); // Tắt trục Y bên trái
+        rightAxis.setEnabled(false); // Tắt trục Y bên phải
+
+        barData.setBarWidth(0.4f);
+
+        customizeBarChart(barChart);
+        barChart.setFitBars(true); // Tự động căn chỉnh các cột
+        barChart.animateY(1000); // Hiệu ứng khi hiển thị biểu đồ
+        barChart.invalidate(); // Cập nhật biểu đồ
+    }
+    // Hàm thiết lập màu sắc PieChart
     private void setupPieChart(PieChart pieChart, ArrayList<PieEntry> userPieEntries) {
         PieDataSet pieDataSet = new PieDataSet(userPieEntries, "");
 
@@ -223,71 +415,104 @@ public class HomeFragment extends Fragment {
         return years.toArray(new String[0]);
     }
 
-
-    // Giả lập hàm lấy dữ liệu người dùng cho PieChart
+    //Thêm dữ liệu cho PieChart
     private ArrayList<PieEntry> getUserPieData() {
 
-        // Khởi tạo SharedPreferences
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        // Chuyển đổi categoryJson thành danh sách các đối tượng Category
+        Gson gson = new Gson();
+        Type categoryType = new TypeToken<List<DTBase.Category>>() {}.getType();
+        List<DTBase.Category> categoryList = gson.fromJson(categoryJson, categoryType);
 
-        // Lấy giá trị của `isPersonnal`, với giá trị mặc định là `false` nếu biến chưa được lưu
-        boolean isPersonnal = sharedPreferences.getBoolean("isPersonnal", false);
-
+        // Danh sách PieEntry để trả về
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
 
-        if (isPersonnal) {
-            pieEntries.add(new PieEntry(25f, "Bill"));       // Hóa đơn
-            pieEntries.add(new PieEntry(15f, "Education"));  // Giáo dục
-            pieEntries.add(new PieEntry(30f, "Food"));       // Ăn uống
-            // Dữ liệu sẽ thay đổi tùy thuộc vào nguồn người dùng
-        }
-        else{
-            pieEntries.add(new PieEntry(15f, "Marketing"));       // Tiếp thị
-            pieEntries.add(new PieEntry(15f, "Maintenance"));  // Bảo trì
-            pieEntries.add(new PieEntry(30f, "Project Costs"));       // Dự án
-            pieEntries.add(new PieEntry(20f, "Personnel Costs")); //lương nhân viên
+        if (financialJson != null) {
+            // Sử dụng Gson để chuyển JSON thành danh sách các đối tượng Financial
+            Type financialType = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, financialType);
+
+            // Khởi tạo một HashMap để gộp các giá trị theo categoryID
+            HashMap<Integer, Float> categoryAmountMap = new HashMap<>();
+
+            // Duyệt qua từng phần tử Financial
+            for (DTBase.Financial financial : financialList) {
+                // Kiểm tra loại financial: chỉ lấy các mục có `financialType` là "expense"
+                if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
+                    if (isPersonal) {
+                        // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
+                        if (financial.getCategoryID() < 20) {
+                            // Cộng dồn financialAmount vào categoryID tương ứng
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    } else {
+                        // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
+                        if (financial.getCategoryID() >= 20) {
+                            // Cộng dồn financialAmount vào categoryID tương ứng
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Tạo PieEntry từ categoryAmountMap và categoryList
+            for (Map.Entry<Integer, Float> entry : categoryAmountMap.entrySet()) {
+                int categoryID = entry.getKey();
+                float amount = entry.getValue();
+
+                // Lấy tên category từ categoryList dựa trên categoryID
+                String categoryName = "Unknown"; // Mặc định là "Unknown" nếu không tìm thấy
+                for (DTBase.Category category : categoryList) {
+                    Log.d("DEBUG", "Comparing categoryID: " + categoryID + " with " + category.getCategoryID());
+                    if (category.getCategoryID() == categoryID) {
+                        categoryName = category.getCategoryName();
+                        Log.d("DEBUG", "Matched categoryID: " + categoryID + ", Name: " + categoryName);
+                        break;
+                    }
+                }
+
+                // Kiểm tra nếu không tìm thấy tên category
+                if ("Unknown".equals(categoryName)) {
+                    Log.e("ERROR", "Category ID not found: " + categoryID);
+                }
+
+                // Thêm PieEntry vào danh sách
+                pieEntries.add(new PieEntry(amount, categoryName));
+            }
+
         }
 
+        // Trả về danh sách PieEntry
         return pieEntries;
     }
 
 
-    // Hàm thiết lập BarChart với hai cột: chi phí và thu nhập
-    private void setupBarChartExpenseIncome(BarChart barChart) {
-        // Giả sử lấy dữ liệu chi phí và thu nhập từ người dùng
-        float userExpense = 10f;
-        float userIncome = 30f;   // Hàm giả định để lấy dữ liệu thu nhập
+    // Hàm chung để tùy chỉnh BarChart cho Expense và Income
+    private void customizeBarChart(BarChart barChart) {
+        barChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        barChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        barChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
+        barChart.getLegend().setDrawInside(false);
 
-        ArrayList<BarEntry> barEntries1 = new ArrayList<>();
-        barEntries1.add(new BarEntry(0, userExpense)); // Cột 1 (Chi phí)
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setDrawAxisLine(false);
 
-        ArrayList<BarEntry> barEntries2 = new ArrayList<>();
-        barEntries2.add(new BarEntry(1, userIncome)); // Cột 2 (Thu nhập)
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setDrawAxisLine(false);
+        leftAxis.setEnabled(false);
 
-        BarDataSet barDataSet1 = new BarDataSet(barEntries1, "Expense");
-        barDataSet1.setColor(getResources().getColor(R.color.color5));
+        YAxis rightAxis = barChart.getAxisRight();
+        rightAxis.setEnabled(false);
 
-        BarDataSet barDataSet2 = new BarDataSet(barEntries2, "Income");
-        barDataSet2.setColor(getResources().getColor(R.color.color6));
-
-        BarData barData = new BarData(barDataSet1, barDataSet2);
-        barData.setBarWidth(0.4f);
-
-        barChart.setData(barData);
-        customizeBarChart(barChart);
-        barChart.invalidate();
-    }
-
-    private float getUserExpense() {
-        // Giả lập lấy dữ liệu chi phí từ một cơ sở dữ liệu hoặc từ tài khoản người dùng
-        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getFloat("UserExpense", 0f); // Giá trị mặc định là 0 nếu không có dữ liệu
-    }
-
-    private float getUserIncome() {
-        // Giả lập lấy dữ liệu chi phí từ một cơ sở dữ liệu hoặc từ tài khoản người dùng
-        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getFloat("UserExpense", 0f); // Giá trị mặc định là 0 nếu không có dữ liệu
+        barChart.getDescription().setEnabled(false);
     }
 
     // Hàm thiết lập BarChart tài chính với dữ liệu từ người dùng
@@ -305,31 +530,6 @@ public class HomeFragment extends Fragment {
         customizeBarChartFinancial(barChart);
         barChart.invalidate();
     }
-
-    // Hàm chung để tùy chỉnh BarChart cho Expense và Income
-    private void customizeBarChart(BarChart barChart) {
-        barChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        barChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        barChart.getLegend().setOrientation(Legend.LegendOrientation.VERTICAL);
-        barChart.getLegend().setDrawInside(false);
-
-        XAxis xAxis = barChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setDrawAxisLine(false);
-        xAxis.setDrawLabels(false); // Ẩn các nhãn trên trục X
-
-        YAxis leftAxis = barChart.getAxisLeft();
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setDrawAxisLine(false);
-        leftAxis.setEnabled(false);
-
-        YAxis rightAxis = barChart.getAxisRight();
-        rightAxis.setEnabled(false);
-
-        barChart.getDescription().setEnabled(false);
-    }
-
     private void customizeBarChartFinancial(BarChart barChart) {
         barChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         barChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
