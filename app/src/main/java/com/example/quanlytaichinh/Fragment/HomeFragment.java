@@ -2,6 +2,7 @@ package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,7 +42,11 @@ import android.content.Context;
 
 import java.lang.reflect.Type;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -123,35 +128,42 @@ public class HomeFragment extends Fragment {
         });
 
         //Thiết lập spinner chọn khoảng thời gian cho biểu đồ chi phí và thu nhập
-
         Spinner spinnerDuration = view.findViewById(R.id.spinner_duration);
         String[] durationOptions = {"Today", "This Week", "This Month", "This Year"};
         CustomSpinnerAdapter adapter = new CustomSpinnerAdapter(requireContext(), durationOptions);
         spinnerDuration.setAdapter(adapter);
-
         // Lấy vị trí đã lưu trong SharedPreferences và cài đặt cho Spinner
         SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         int savedPosition = prefs.getInt(KEY_SELECTED_POSITION, 0);
         spinnerDuration.setSelection(savedPosition);
         adapter.setSelectedPosition(savedPosition);
 
-        // Sự kiện khi người dùng chọn một item trong Spinner
+        // Thiết lập BarChart chi phí và thu nhập
+        BarChart barChart = view.findViewById(R.id.barChart);
+
+        // Đặt sự kiện khi người dùng chọn item trong Spinner
         spinnerDuration.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                // Lấy giá trị item đã chọn
+                String selectedDuration = durationOptions[position];
                 // Cập nhật vị trí item đã chọn trong adapter
                 adapter.setSelectedPosition(position);
                 // Lưu vị trí đã chọn vào SharedPreferences
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt(KEY_SELECTED_POSITION, position);
                 editor.apply();
+                // Gọi hàm xử lý sự kiện với item đã chọn
+                onDurationSelected(selectedDuration, barChart);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Không có item nào được chọn
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Không làm gì khi không có lựa chọn nào được chọn
             }
         });
+
+
 
         // Thiết lập spinner year:
         Spinner spinnerYear = view.findViewById(R.id.spinner_year);
@@ -189,13 +201,6 @@ public class HomeFragment extends Fragment {
         // Thiết lập PieChart
         PieChart pieChart = view.findViewById(R.id.pieChart);
         setupPieChart(pieChart, getUserPieData());
-
-
-        // Thiết lập BarChart chi phí và thu nhập
-        BarChart barChart = view.findViewById(R.id.barChart);
-        ArrayList<BarEntry> userBarEntries = getUserBarExpenseIncome();
-        setupBarChartExpenseIncome(barChart, userBarEntries);
-
 
         // Thiết lập BarChart tài chính với dữ liệu tùy chỉnh
         BarChart barChartFinancial = view.findViewById(R.id.barChart_financial);
@@ -255,9 +260,37 @@ public class HomeFragment extends Fragment {
         return amount;  // Trả về tổng số dư dưới dạng double
     }
 
+    // Hàm xử lý sự kiện khi chọn item trong Spinner
+    private void onDurationSelected(String selectedDuration, BarChart barChart) {
+
+        switch (selectedDuration) {
+            case "Today":
+                ArrayList<BarEntry> userBarEntries1 = getUserBarExpenseIncome(1);
+                setupBarChartExpenseIncome(barChart, userBarEntries1);
+                break;
+            case "This Week":
+                ArrayList<BarEntry> userBarEntries2 = getUserBarExpenseIncome(2);
+                setupBarChartExpenseIncome(barChart, userBarEntries2);
+                break;
+            case "This Month":
+                ArrayList<BarEntry> userBarEntries3 = getUserBarExpenseIncome(3);
+                setupBarChartExpenseIncome(barChart, userBarEntries3);
+                break;
+            case "This Year":
+                ArrayList<BarEntry> userBarEntries4 = getUserBarExpenseIncome(4);
+                setupBarChartExpenseIncome(barChart, userBarEntries4);
+                break;
+            default:
+                Log.d("Spinner", "No selection");
+                break;
+        }
+    }
+
+
     //Thêm dữ liệu cho BarChart
-    private ArrayList<BarEntry> getUserBarExpenseIncome(){
-        // Danh sách PieEntry để trả về 2 cột expense và income
+    private ArrayList<BarEntry> getUserBarExpenseIncome(int type){
+
+        // Danh sách BarEntry để trả về 2 cột expense và income
         ArrayList<BarEntry> barEntries = new ArrayList<>();
         Gson gson = new Gson();
         if (financialJson != null) {
@@ -271,34 +304,73 @@ public class HomeFragment extends Fragment {
 
             // Duyệt qua từng phần tử Financial
             for (DTBase.Financial financial : financialList) {
-                if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
-                    // Kiểm tra điều kiện là cá nhân hoặc không phải cá nhân
-                    if (isPersonal) {
-                        // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
-                        if (financial.getCategoryID() < 20) {
-                            totalExpense += financial.getFinancialAmount();
-                        }
-                    } else {
-                        // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
-                        if (financial.getCategoryID() >= 20) {
-                            totalExpense += financial.getFinancialAmount();
-                        }
-                    }
+
+                String financialDateString = financial.getFinancialDate(); // Chuỗi ngày tháng, ví dụ: "yyyy-MM-dd"
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date financialDate = null;
+                try {
+                    financialDate = dateFormat.parse(financialDateString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-                else if ("income".equalsIgnoreCase(financial.getFinancialType())) {
-                    // Tương tự cho income
-                    if (isPersonal) {
-                        if (financial.getCategoryID() < 20) {
-                            totalIncome += financial.getFinancialAmount();
+
+                Calendar currentDate = Calendar.getInstance();
+
+                switch(type){
+                    case 1:
+                        if(financialDate != null){
+                            //Kiểm tra nếu type=1 -> lấy dữ liệu financial có financialDate = currentDate
+                            if (currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900 &&
+                                    currentDate.get(Calendar.MONTH) == financialDate.getMonth() &&
+                                    currentDate.get(Calendar.DAY_OF_MONTH) == financialDate.getDate()) {
+                                totalExpense += getExpense(financial, isPersonal);
+                                totalIncome += getIncome(financial, isPersonal);
+                            }
+
                         }
-                    } else {
-                        if (financial.getCategoryID() >= 20) {
-                            totalIncome += financial.getFinancialAmount();
+                        break;
+                    case 2:
+                        // Lấy ngày đầu tiên của tuần (Chủ nhật)
+                        Calendar startOfWeek = (Calendar) currentDate.clone();
+                        startOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+
+                        // Lấy ngày cuối cùng của tuần (Thứ Bảy)
+                        Calendar endOfWeek = (Calendar) currentDate.clone();
+                        endOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+
+                        if(financialDate != null){
+                            // Kiểm tra xem financialDate có nằm trong tuần của currentDate không
+                            if (financialDate.compareTo(startOfWeek.getTime()) >= 0 && financialDate.compareTo(endOfWeek.getTime()) <= 0) {
+                                totalExpense += getExpense(financial, isPersonal);
+                                totalIncome += getIncome(financial, isPersonal);
+                            }
                         }
-                    }
+                        break;
+                    case 3:
+                        //Kiểm tra nếu type=3 -> lấy dữ liệu financial có financialDate trong tháng hiện tại
+
+                        if(financialDate != null){
+                            if (currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900 &&
+                                    currentDate.get(Calendar.MONTH) == financialDate.getMonth()) {
+                                totalExpense += getExpense(financial, isPersonal);
+                                totalIncome += getIncome(financial, isPersonal);
+                            }
+                        }
+
+                        break;
+                    case 4:
+                        //Kiểm tra nếu type=4 -> lấy dữ liệu financial có financialDate trong năm hiện tại
+                        if(financialDate != null){
+                            if (currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900) {
+                                totalExpense += getExpense(financial, isPersonal);
+                                totalIncome += getIncome(financial, isPersonal);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
-
             // Thêm các giá trị vào BarEntry (cột 0 là expense, cột 1 là income)
             barEntries.add(new BarEntry(0, (float)totalExpense)); // Expense
             barEntries.add(new BarEntry(1, (float)totalIncome)); // Income
@@ -306,6 +378,42 @@ public class HomeFragment extends Fragment {
 
         // Trả về danh sách BarEntry
         return barEntries;
+    }
+
+    private double getExpense(DTBase.Financial financial, boolean isPersonal) {
+        double totalExpense = 0.0;
+        if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
+            // Kiểm tra điều kiện là cá nhân hoặc không phải cá nhân
+            if (isPersonal) {
+                // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
+                if (financial.getCategoryID() < 20) {
+                    totalExpense += financial.getFinancialAmount();
+                }
+            } else {
+                // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
+                if (financial.getCategoryID() >= 20) {
+                    totalExpense += financial.getFinancialAmount();
+                }
+            }
+        }
+        return totalExpense;
+
+    }
+    private double getIncome(DTBase.Financial financial, boolean isPersonal) {
+        double totalIncome = 0.0;
+        if ("income".equalsIgnoreCase(financial.getFinancialType())) {
+            // Tương tự cho income
+            if (isPersonal) {
+                if (financial.getCategoryID() < 20) {
+                    totalIncome += financial.getFinancialAmount();
+                }
+            } else {
+                if (financial.getCategoryID() >= 20) {
+                    totalIncome += financial.getFinancialAmount();
+                }
+            }
+        }
+        return totalIncome;
     }
 
     // Hàm thiết lập BarChart với hai cột: chi phí và thu nhập
