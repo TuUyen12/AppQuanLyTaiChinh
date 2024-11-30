@@ -45,6 +45,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -167,7 +168,6 @@ public class HomeFragment extends Fragment {
 
         // Thiết lập spinner year:
         Spinner spinnerYear = view.findViewById(R.id.spinner_year);
-
         String[] yearOptions = generateYearOptions(2024, 2010);
 
         CustomSpinnerAdapter adapterYear = new CustomSpinnerAdapter(requireContext(), yearOptions);
@@ -180,6 +180,8 @@ public class HomeFragment extends Fragment {
         spinnerYear.setSelection(savedYearPosition);
         adapterYear.setSelectedPosition(savedYearPosition);
 
+        // Thiết lập BarChart tài chính với dữ liệu tùy chỉnh
+        BarChart barChartFinancial = view.findViewById(R.id.barChart_financial);
         // Sự kiện khi người dùng chọn một item trong Spinner year
         spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -190,6 +192,10 @@ public class HomeFragment extends Fragment {
                 SharedPreferences.Editor editor = yearPrefs.edit();
                 editor.putInt(KEY_SELECTED_YEAR, position);
                 editor.apply();
+                // Lấy giá trị item đã chọn
+                int selectedYear = Integer.parseInt(yearOptions[position]);
+                ArrayList<BarEntry> userFinancialData = getUserFinancialData(selectedYear);
+                setupBarChartFinancial(barChartFinancial, userFinancialData);
             }
 
             @Override
@@ -201,11 +207,6 @@ public class HomeFragment extends Fragment {
         // Thiết lập PieChart
         PieChart pieChart = view.findViewById(R.id.pieChart);
         setupPieChart(pieChart, getUserPieData());
-
-        // Thiết lập BarChart tài chính với dữ liệu tùy chỉnh
-        BarChart barChartFinancial = view.findViewById(R.id.barChart_financial);
-        ArrayList<BarEntry> userFinancialData = getUserFinancialData(); // Giả sử lấy dữ liệu từ người dùng
-        setupBarChartFinancial(barChartFinancial, userFinancialData);
 
         return view;
     }
@@ -623,6 +624,44 @@ public class HomeFragment extends Fragment {
         barChart.getDescription().setEnabled(false);
     }
 
+
+    //Thêm dữ liệu cho barchart tài chính
+    private ArrayList<BarEntry> getUserFinancialData(int year) {
+        //Danh sách BarEntry để trả về 2 cột expense và income
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        Gson gson = new Gson();
+        if (financialJson != null) {
+            // Sử dụng Gson để chuyển JSON thành danh sách các đối tượng Financial
+            Type financialType = new TypeToken<List<DTBase.Financial>>() {
+            }.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, financialType);
+            // Duyệt qua từng phần tử Financial
+
+            double[] a = new double[13];
+            for (int i = 1; i < 13; i++) {
+                a[i] = 0.0;
+                for (DTBase.Financial financial : financialList) {
+
+                    String financialDateString = financial.getFinancialDate(); // Chuỗi ngày tháng, ví dụ: "yyyy-MM-dd"
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    Date financialDate = null;
+                    try {
+                        financialDate = dateFormat.parse(financialDateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (financialDate.getYear() + 1900 == year && financialDate.getMonth() + 1 == i) {
+                        a[i] += getExpense(financial, isPersonal);
+                    }
+
+                }
+                // Thêm các giá trị vào BarEntry (cột 0 là expense, cột 1 là income)
+                barEntries.add(new BarEntry(i-1, (float) a[i])); // Expense theo tháng
+            }
+        }
+        return barEntries;
+    }
+
     // Hàm thiết lập BarChart tài chính với dữ liệu từ người dùng
     private void setupBarChartFinancial(BarChart barChart, ArrayList<BarEntry> barEntries) {
         BarDataSet barDataSet = new BarDataSet(barEntries, "Expense");
@@ -669,25 +708,5 @@ public class HomeFragment extends Fragment {
         barChart.getDescription().setEnabled(false);
     }
 
-
-
-    // Hàm giả định để lấy dữ liệu từ người dùng cho BarChart tài chính
-    private ArrayList<BarEntry> getUserFinancialData() {
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
-        // Giả sử các giá trị này tương ứng với từng tháng
-        barEntries.add(new BarEntry(0, 10));  // Tháng 1
-        barEntries.add(new BarEntry(1, 20));  // Tháng 2
-        barEntries.add(new BarEntry(2, 30));  // Tháng 3
-        barEntries.add(new BarEntry(3, 25));  // Tháng 4
-        barEntries.add(new BarEntry(4, 15));  // Tháng 5
-        barEntries.add(new BarEntry(5, 0));  // Tháng 6
-        barEntries.add(new BarEntry(6, 35));  // Tháng 7
-        barEntries.add(new BarEntry(7, 50));  // Tháng 8
-        barEntries.add(new BarEntry(8, 0));  // Tháng 9
-        barEntries.add(new BarEntry(9, 45));  // Tháng 10
-        barEntries.add(new BarEntry(10, 55)); // Tháng 11
-        barEntries.add(new BarEntry(11, 70)); // Tháng 12
-        return barEntries;
-    }
 
 }
