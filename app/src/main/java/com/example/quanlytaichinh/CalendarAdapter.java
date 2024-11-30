@@ -88,5 +88,19 @@ public class CalendarAdapter extends BaseAdapter {
 
         return convertView;
     }
+    public void setData(List<DTBase.Financial> newItemList) {
+        if (itemList != null) {
+            itemList.clear();  // Xóa tất cả các phần tử trong danh sách
+            itemList.addAll(newItemList);  // Thêm dữ liệu mới vào itemList
+            notifyDataSetChanged();  // Cập nhật giao diện
+        }
+    }
+
+    public void clear() {
+        if (itemList != null) {
+            itemList.clear();  // Xóa tất cả các phần tử trong danh sách
+            notifyDataSetChanged(); // Cập nhật giao diện
+        }
+    }
 
 }

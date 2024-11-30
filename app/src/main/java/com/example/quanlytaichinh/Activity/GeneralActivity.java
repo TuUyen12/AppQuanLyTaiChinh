@@ -49,6 +49,12 @@ public class GeneralActivity extends AppCompatActivity {
                         break;
                     case 1:
                         selectedFragment = new CalendarFragment();
+                        Bundle bundle3 = new Bundle();
+                        bundle3.putSerializable("User", authUser);
+                        selectedFragment.setArguments(bundle3);
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, selectedFragment)
+                                .commit();
                         break;
                     case 2:
                         selectedFragment = new InsertFragment();

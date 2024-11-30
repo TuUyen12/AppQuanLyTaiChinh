@@ -135,6 +135,7 @@ public class SignUpActivity extends AppCompatActivity {
         Category.add(new DTBase.Category(24,R.drawable.ic_personnel, "Salary", "expense", userId));
         Category.add(new DTBase.Category(25,R.drawable.ic_maintenance, "Maintenance", "expense", userId));
         Category.add(new DTBase.Category(26,R.drawable.ic_project, "Project Costs", "expense", userId));
+
         Category.add(new DTBase.Category(27,R.drawable.ic_project_payment, "Project Payment", "income", userId));
         Category.add(new DTBase.Category(28,R.drawable.ic_investment, "Investment", "income", userId));
         Category.add(new DTBase.Category(29,R.drawable.ic_sales, "Sales Revenue", "income", userId));

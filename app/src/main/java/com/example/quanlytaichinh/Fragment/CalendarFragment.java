@@ -57,8 +57,10 @@ public class CalendarFragment extends Fragment {
     private boolean isPersonal;
     private String categoryJson;
     private String financialJson;
-
+    int userId;
     private Context context;
+    private CalendarAdapter adapter;
+
 
     @Nullable
     @Override
@@ -88,6 +90,12 @@ public class CalendarFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             authUser = (DTBase.User) bundle.getSerializable("User"); // Ép kiểu về User
+            if(authUser != null){
+                userId = authUser.getUserID();
+            }else{
+                // Gán giá trị mặc định nếu authUser là null
+                userId = -1; // Hoặc giá trị hợp lệ tùy theo yêu cầu của bạn
+            }
         }
 
         // Ánh xạ các thành phần giao diện
@@ -103,9 +111,16 @@ public class CalendarFragment extends Fragment {
         selectedDay = currentDate.get(Calendar.DAY_OF_MONTH);
 
         List<DTBase.Financial> calendarItems = getFinancialByDate(currentDate.getTime());
-        // Thiết lập adapter cho ListView
         CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
-        lvShowInsert.setAdapter(adapter);
+        // Thiết lập adapter cho ListView
+        if (calendarItems != null && !calendarItems.isEmpty()) {
+            lvShowInsert.setAdapter(adapter);
+        } else {
+            Toast.makeText(getActivity(), "No financial data available for the selected date", Toast.LENGTH_SHORT).show();
+        }
+
+
+
 
         // Hiển thị ngày mặc định lên TextView
         updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
@@ -184,6 +199,7 @@ public class CalendarFragment extends Fragment {
                     bundle.putInt("selectedYear", selectedYear);
                     bundle.putInt("selectedMonth", selectedMonth + 1);
                     bundle.putInt("selectedDay", selectedDay);
+                    bundle.putSerializable("User", authUser);
 
                     InsertFragment insertFragment = new InsertFragment();
                     insertFragment.setArguments(bundle);
@@ -201,11 +217,20 @@ public class CalendarFragment extends Fragment {
         // Sự kiện khi nhấn giữ vào một mục trong ListView
         lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ShowChooseEdit_Delete();
-                return false;
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                // Lấy đối tượng Financial tại vị trí "position"
+                DTBase.Financial financialItem = (DTBase.Financial) adapterView.getItemAtPosition(position);
+
+                // Lấy financialID từ đối tượng Financial
+                int financialID = financialItem.getFinancialID();
+                int userID = financialItem.getUserID();
+                // Gọi hàm xử lý Edit/Delete với financialID
+                ShowDelete(userID, financialID);
+
+                return true; // Trả về true để sự kiện được xử lý và không tiếp tục với các hành động khác
             }
         });
+
 
         return view;
     }
@@ -271,22 +296,63 @@ public class CalendarFragment extends Fragment {
     }
 
     // Hàm xử lý sự kiện chọn Edit hoặc Delete
-    private void ShowChooseEdit_Delete() {
+    private void ShowDelete(int userID, int financialID) {
+        if (userID <= 0 || financialID <= 0) {
+            Toast.makeText(getActivity(), "Invalid data. Cannot delete." + userID + " " + financialID, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = "Do you want to delete?";
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Edit or Delete");
+        builder.setTitle("Delete")
+                .setMessage(message)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Tạo đối tượng DTBase để xóa dữ liệu
+                    DTBase database = new DTBase();
+                    database.deleteFinancial(userID, financialID);
 
-        // Xử lý sự kiện khi người dùng chọn Edit
-        builder.setPositiveButton("Edit", (dialog, which) -> {
-            // Sự kiện sửa
-        });
+                    // Sau khi xóa thành công, tải lại dữ liệu từ Firebase và cập nhật ListView
+                    updateListView();
+                    // Cập nhật SharedPreferences
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.clear();
+                    editor.apply();
 
-        // Xử lý sự kiện khi người dùng chọn Delete
-        builder.setNegativeButton("Delete", (dialog, which) -> {
-            // Sự kiện xóa
-        });
+                    // Thông báo sau khi xóa thành công
+                    Toast.makeText(getActivity(), "Deleted successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Đóng dialog khi người dùng chọn "No"
+                    dialog.dismiss();
+                });
 
-        // Hiển thị dialog
         builder.create().show();
     }
+
+    private void updateListView() {
+        DTBase db = new DTBase();
+        db.fetchFinancialData(userId, new DTBase.FinancialCallback() {
+            @Override
+            public void onFinancialDataFetched(List<DTBase.Financial> financialList) {
+                if (financialList != null) {
+                    if (adapter == null) {
+                        adapter = new CalendarAdapter(getContext(), financialList);
+                        lvShowInsert.setAdapter(adapter);
+                    } else {
+                        adapter.setData(financialList); // Sử dụng setData để cập nhật dữ liệu
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "Error loading financial data", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getActivity(), "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
 }

@@ -1,19 +1,25 @@
 package com.example.quanlytaichinh.DataBase;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.quanlytaichinh.Activity.SignInActivity;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.security.MessageDigest;
 
 import java.security.NoSuchAlgorithmException;
@@ -424,8 +430,58 @@ public class DTBase {
         for (Category category : categoryList) {
             addNewCategory(category, userId, category.getCategoryID());
         }
-
     }
+    public void updateFinancial(Financial financial) {
+        // Kiểm tra đối tượng financial có hợp lệ không
+        if (financial == null || financial.getUserID() <= 0 || financial.getFinancialID() <= 0) {
+            System.out.println("Invalid financial data. Update aborted.");
+            return;
+        }
+
+        // Cập nhật mục tài chính trong Firebase
+        mDatabase.child("FINANCIALS")
+                .child(String.valueOf(financial.getUserID()))
+                .child(String.valueOf(financial.getFinancialID()))
+                .setValue(financial)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Thành công
+                        System.out.println("Financial updated successfully for UserID: " + financial.getUserID());
+                    } else {
+                        // Thất bại
+                        System.err.println("Error updating financial: " + (task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Unknown error"));
+                    }
+                });
+    }
+
+    public void deleteFinancial(int userID, int financialID) {
+        // Kiểm tra các tham số đầu vào có hợp lệ hay không
+        if (userID <= 0 || financialID <= 0) {
+            System.out.println("Invalid userID or financialID. Deletion aborted.");
+            return;
+        }
+
+        // Xóa mục tài chính khỏi Firebase
+        mDatabase.child("FINANCIALS")
+                .child(String.valueOf(userID))
+                .child(String.valueOf(financialID))
+                .removeValue()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Thành công
+                        System.out.println("Financial deleted successfully for UserID: " + userID + ", FinancialID: " + financialID);
+                    } else {
+                        // Thất bại
+                        System.err.println("Error deleting financial: " + (task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Unknown error"));
+                    }
+                });
+    }
+
+
 
     //User
     public static class User implements Serializable {
@@ -594,6 +650,7 @@ public class DTBase {
         public void setFinancialDate(String financialDate) {
             this.financialDate = financialDate;
         }
+
 
     }
     //Category
