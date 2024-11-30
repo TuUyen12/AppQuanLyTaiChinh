@@ -54,20 +54,30 @@ public class InsertFragment extends Fragment {
         View view = inflater.inflate(R.layout.insert_layout, container, false);
 
         tvShowDay = view.findViewById(R.id.tv_show_day);
+        // Hiển thị ngày hiện tại
+        setCurrentDate();
         Bundle bundle = getArguments();
         if (bundle != null) {
             authUser = (User) bundle.getSerializable("User");
-            if (authUser == null) {
-                Toast.makeText(getActivity(), "User not found", Toast.LENGTH_SHORT).show();
-            } else {
+            if (authUser != null) {
                 userId = authUser.getUserID();
-                // Tiếp tục xử lý
             }
-            int year = bundle.getInt("selectedYear");
-            int month = bundle.getInt("selectedMonth");
-            int day = bundle.getInt("selectedDay");
-            tvShowDay.setText(String.format("%02d/%02d/%04d", day, month, year));
+
+            // Kiểm tra và hiển thị ngày được chọn từ CalendarFragment
+            int year = bundle.getInt("selectedYear", -1); // Sử dụng -1 nếu không có dữ liệu
+            int month = bundle.getInt("selectedMonth", -1); // Sử dụng -1 nếu không có dữ liệu
+            int day = bundle.getInt("selectedDay", -1); // Sử dụng -1 nếu không có dữ liệu
+
+            // Nếu dữ liệu ngày hợp lệ (khác -1), cập nhật ngày trên TextView
+            if (year != -1 && month != -1 && day != -1) {
+                tvShowDay.setText(String.format("%d/%d/%d", day, month, year));
+            } else {
+                // Nếu không có dữ liệu, hiển thị ngày hiện tại
+                setCurrentDate(); // Gọi lại hàm để đảm bảo ngày hiện tại được hiển thị
+            }
         } else {
+            // Nếu không có bundle, hiển thị ngày hiện tại mặc định
+            setCurrentDate(); // Gọi lại hàm để hiển thị ngày hiện tại
             Toast.makeText(getActivity(), "No data passed", Toast.LENGTH_SHORT).show();
         }
 
@@ -75,8 +85,7 @@ public class InsertFragment extends Fragment {
         gridView = view.findViewById(R.id.grid_view);
         tvfinancial = view.findViewById(R.id.tv_financial); // Khởi tạo TextView
 
-        // Hiển thị ngày hiện tại
-        setCurrentDate();
+
 
         // Khởi tạo danh sách cho income và expense
         loadCategoriesFromPreferences();
@@ -231,4 +240,5 @@ public class InsertFragment extends Fragment {
         int year = calendar.get(Calendar.YEAR);
         tvShowDay.setText(String.format("%02d/%02d/%04d", day, month, year)); // Hiển thị ngày hiện tại
     }
+
 }

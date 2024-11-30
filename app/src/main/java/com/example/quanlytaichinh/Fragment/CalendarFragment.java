@@ -2,6 +2,8 @@ package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -10,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,24 +27,24 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.quanlytaichinh.CalendarAdapter;
-import com.example.quanlytaichinh.CalendarItem;
 import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-import com.prolificinteractive.materialcalendarview.CalendarDay;
-import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Date;
 
 public class CalendarFragment extends Fragment {
 
-    MaterialCalendarView calendarView;
+    CalendarView calendarView;
     ImageButton ibInsert;
     TextView tvShowDay;
     ListView lvShowInsert;
@@ -50,6 +54,9 @@ public class CalendarFragment extends Fragment {
     private int selectedYear = -1;
     private int selectedMonth = -1;
     private int selectedDay = -1;
+    private boolean isPersonal;
+    private String categoryJson;
+    private String financialJson;
 
     private Context context;
 
@@ -62,6 +69,18 @@ public class CalendarFragment extends Fragment {
         Configuration config = new Configuration();
         config.setLocale(locale);
         getActivity().getResources().updateConfiguration(config, null);
+
+        // Khởi tạo SharedPreferences để lấy dữ liệu isPersonal
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        isPersonal = sharedPreferences.getBoolean("isPersonal", false);
+
+        // Khởi tạo SharedPreferences để lấy dữ liệu category
+        SharedPreferences categorySharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
+        categoryJson = categorySharedPreferences.getString("category", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([])
+
+        // Khởi tạo SharedPreferences để lấy dữ liệu financial
+        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+        financialJson = financialSharedPreferences.getString("financialList", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([])
 
         View view = inflater.inflate(R.layout.calendar_layout, container, false);
 
@@ -77,57 +96,82 @@ public class CalendarFragment extends Fragment {
         tvShowDay = view.findViewById(R.id.tv_show_day);
         lvShowInsert = view.findViewById(R.id.lv_show_insert);
 
-        // Khởi tạo SharedPreferences
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-
-        // Lấy giá trị của `isPersonal`
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
-        List<DTBase.Financial> calendarItems = new ArrayList<>();
-
-        // Lấy dữ liệu tài chính từ SharedPreferences
-        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
-        String financialJson = financialSharedPreferences.getString("financialList", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([]);
-        if (financialJson != null) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<List<DTBase.Financial>>() {}.getType();
-            calendarItems = gson.fromJson(financialJson, type);
-            for (DTBase.Financial financial : calendarItems) {
-                System.out.println(financial.getFinancialID());
-            }
-        }
-
-        // Thiết lập adapter cho ListView
-        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
-        lvShowInsert.setAdapter(adapter);
-
-        // Sự kiện khi nhấn giữ vào một mục trong ListView
-        lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ShowChooseEdit_Delete();
-                return false;
-            }
-        });
-
         // Lấy ngày hiện tại khi mở app lên
         Calendar currentDate = Calendar.getInstance();
         selectedYear = currentDate.get(Calendar.YEAR);
         selectedMonth = currentDate.get(Calendar.MONTH);
         selectedDay = currentDate.get(Calendar.DAY_OF_MONTH);
 
+        List<DTBase.Financial> calendarItems = getFinancialByDate(currentDate.getTime());
+        // Thiết lập adapter cho ListView
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+        lvShowInsert.setAdapter(adapter);
+
         // Hiển thị ngày mặc định lên TextView
         updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
 
-        // Thiết lập sự kiện khi chọn ngày trong MaterialCalendarView
-        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+        // Thiết lập sự kiện khi chọn ngày trong CalendarView
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                selectedYear = date.getYear();
-                selectedMonth = date.getMonth();
-                selectedDay = date.getDay();
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {
+                selectedYear = year;
+                selectedMonth = month;
+                selectedDay = dayOfMonth;
 
                 // Hiển thị ngày đã chọn lên TextView
                 updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
+
+                // Tạo ngày từ các tham số đã chọn
+                Calendar selectedDate = Calendar.getInstance();
+                selectedDate.set(selectedYear, selectedMonth, selectedDay);
+
+                // Lấy các mục tài chính theo ngày đã chọn
+                List<DTBase.Financial> calendarItems = getFinancialByDate(selectedDate.getTime());
+
+                // Thiết lập adapter cho ListView
+                CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+                lvShowInsert.setAdapter(adapter);
+            }
+        });
+        // Thiết lập sự kiện khi nhấn vào TextView để chọn ngày
+        tvShowDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Hiển thị DatePickerDialog để người dùng chọn ngày
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                // Cập nhật lại các giá trị ngày, tháng, năm
+                                selectedYear = year;
+                                selectedMonth = monthOfYear;
+                                selectedDay = dayOfMonth;
+
+                                // Cập nhật lại ngày trên TextView
+                                updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
+
+                                // Tạo ngày từ các tham số đã chọn
+                                Calendar selectedDate = Calendar.getInstance();
+                                selectedDate.set(selectedYear, selectedMonth, selectedDay);
+
+                                // Lấy các mục tài chính theo ngày đã chọn
+                                List<DTBase.Financial> calendarItems = getFinancialByDate(selectedDate.getTime());
+
+                                // Thiết lập adapter cho ListView
+                                CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+                                lvShowInsert.setAdapter(adapter);
+
+                                // Cập nhật ngày đã chọn lên CalendarView
+                                calendarView.setDate(selectedDate.getTimeInMillis(), true, true);
+                            }
+                        },
+                        selectedYear, // Năm hiện tại
+                        selectedMonth, // Tháng hiện tại
+                        selectedDay // Ngày hiện tại
+                );
+                // Hiển thị dialog
+                datePickerDialog.show();
             }
         });
 
@@ -154,14 +198,76 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
+        // Sự kiện khi nhấn giữ vào một mục trong ListView
+        lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ShowChooseEdit_Delete();
+                return false;
+            }
+        });
 
         return view;
     }
+    private ArrayList<DTBase.Financial> getFinancialByDate(Date date) {
+        ArrayList<DTBase.Financial> calendarItems = new ArrayList<>();
+        Gson gson = new Gson();
+
+        if (financialJson != null) {
+            // Chuyển đổi financialJson thành danh sách các đối tượng Financial
+            Type listType = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, listType);
+
+            // Chuyển đổi ngày được truyền vào thành Calendar
+            Calendar selectedCalendar = Calendar.getInstance();
+            selectedCalendar.setTime(date);
+
+            // Duyệt qua danh sách và lọc theo ngày
+            for (DTBase.Financial financial1 : financialList) {
+                String financialDateString = financial1.getFinancialDate(); // Chuỗi ngày tháng, ví dụ: "dd/MM/yyyy"
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date financialDate = null;
+                try {
+                    financialDate = dateFormat.parse(financialDateString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (financialDate != null) {
+                    // Chuyển đổi financialDate thành Calendar
+                    Calendar financialCalendar = Calendar.getInstance();
+                    financialCalendar.setTime(financialDate);
+
+                    if (isPersonal) {
+                        // Trường hợp isPersonal = true, kiểm tra categoryID < 20
+                        if (financial1.getCategoryID() < 20
+                                && selectedCalendar.get(Calendar.YEAR) == financialCalendar.get(Calendar.YEAR)
+                                && selectedCalendar.get(Calendar.MONTH) == financialCalendar.get(Calendar.MONTH)
+                                && selectedCalendar.get(Calendar.DAY_OF_MONTH) == financialCalendar.get(Calendar.DAY_OF_MONTH)) {
+                            calendarItems.add(financial1);
+                        }
+                    } else {
+                        // Trường hợp isPersonal = false, kiểm tra categoryID >= 20
+                        if (financial1.getCategoryID() >= 20
+                                && selectedCalendar.get(Calendar.YEAR) == financialCalendar.get(Calendar.YEAR)
+                                && selectedCalendar.get(Calendar.MONTH) == financialCalendar.get(Calendar.MONTH)
+                                && selectedCalendar.get(Calendar.DAY_OF_MONTH) == financialCalendar.get(Calendar.DAY_OF_MONTH)) {
+                            calendarItems.add(financial1);
+                        }
+                    }
+                }
+            }
+        }
+
+        return calendarItems;
+    }
+
+
 
     // Hàm cập nhật ngày được hiển thị trên TextView
     private void updateDisplayedDate(int day, int month, int year) {
-        String formattedDate = String.format(Locale.ENGLISH, "Date: %02d/%02d/%04d", day, month, year);
-        tvShowDay.setText(formattedDate);
+        String displayedDate = day + "/" + month + "/" + year;
+        tvShowDay.setText(displayedDate);
     }
 
     // Hàm xử lý sự kiện chọn Edit hoặc Delete
