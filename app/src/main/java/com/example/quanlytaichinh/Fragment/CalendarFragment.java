@@ -58,6 +58,7 @@ public class CalendarFragment extends Fragment {
     private String categoryJson;
     private String financialJson;
     int userId;
+    private List<DTBase.Financial> userFinancialList = new ArrayList<>();
     private Context context;
     private CalendarAdapter adapter;
 
@@ -313,6 +314,7 @@ public class CalendarFragment extends Fragment {
 
                     // Sau khi xóa thành công, tải lại dữ liệu từ Firebase và cập nhật ListView
                     updateListView();
+
                     // Cập nhật SharedPreferences
                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -332,10 +334,20 @@ public class CalendarFragment extends Fragment {
 
     private void updateListView() {
         DTBase db = new DTBase();
+        // Lấy dữ liệu tài chính từ Firebase
         db.fetchFinancialData(userId, new DTBase.FinancialCallback() {
             @Override
             public void onFinancialDataFetched(List<DTBase.Financial> financialList) {
                 if (financialList != null) {
+                    userFinancialList.addAll(financialList);
+
+                    // Khi dữ liệu tài chính đã tải xong, lưu vào SharedPreferences
+                    SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyFinancials", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userFinancialList);
+                    editor.putString("financialList", json);
+                    editor.apply();
                     if (adapter == null) {
                         adapter = new CalendarAdapter(getContext(), financialList);
                         lvShowInsert.setAdapter(adapter);
@@ -345,7 +357,7 @@ public class CalendarFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(), "Error loading financial data", Toast.LENGTH_SHORT).show();
                 }
-            }
+                }
 
             @Override
             public void onError(String error) {
