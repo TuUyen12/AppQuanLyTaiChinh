@@ -1,9 +1,8 @@
 package com.example.quanlytaichinh.Activity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -12,18 +11,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Random;
 
 public class FeedbackActivity extends AppCompatActivity {
     private DTBase.User authUser;
-    private EditText feedbackEditText;
+    private EditText etFeedback;
+    private  DatabaseReference mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.feedback_layout);
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         // Ánh xạ view
-        feedbackEditText = findViewById(R.id.feedbackEditText);
+        etFeedback = findViewById(R.id.feedbackEditText);
         Button submitFeedbackButton = findViewById(R.id.submitFeedbackButton);
 
         // Nhận thông tin người dùng từ Intent
@@ -32,36 +37,58 @@ public class FeedbackActivity extends AppCompatActivity {
         submitFeedbackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String feedback = feedbackEditText.getText().toString().trim();
+                String feedback = etFeedback.getText().toString().trim();
                 if (feedback.isEmpty()) {
                     Toast.makeText(FeedbackActivity.this, "Please enter your feedback!", Toast.LENGTH_SHORT).show();
                 } else {
-                    sendFeedbackEmail(feedback);
+                    // Ẩn bàn phím
+                    View view = getCurrentFocus();
+                    if (view != null) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                    etFeedback.setText("");
+                    addFeedback(feedback, authUser.getUserID());
                 }
             }
         });
     }
+    public void addFeedback(String feedback, int userId) {
+        // Tạo ID ngẫu nhiên gồm 6 ký tự
+        String id = generateRandomId(6);
 
-    private void sendFeedbackEmail(String feedback) {
-        // Địa chỉ email nhận phản hồi
-        String recipientEmail = "financialmanagementapp2024@gmail.com";
-
-        // Chủ đề email
-        String subject = "ID: " + (authUser != null ? authUser.getUserID() : "Unknown") + " - Feedback";
-
-        // Intent để mở ứng dụng email
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        emailIntent.setType("message/rfc822"); // Chỉ mở các ứng dụng email
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipientEmail}); // Địa chỉ email
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject); // Chủ đề
-        emailIntent.putExtra(Intent.EXTRA_TEXT, feedback); // Nội dung
-
-        // Kiểm tra nếu có ứng dụng email khả dụng
-        try {
-            startActivity(Intent.createChooser(emailIntent, "Choose an email client:"));
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "No email app found on your device", Toast.LENGTH_SHORT).show();
-        }
+        // Kiểm tra xem ID đã tồn tại chưa
+        mDatabase.child("FEEDBACK").child(String.valueOf(userId)).child(id)
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        // Nếu ID đã tồn tại, tạo lại ID mới
+                        addFeedback(feedback, userId); // Gọi lại phương thức để tạo ID mới
+                    } else {
+                        // Nếu ID chưa tồn tại, thêm phản hồi
+                        mDatabase.child("FEEDBACK").child(String.valueOf(userId)).child(id)
+                                .setValue(feedback)
+                                .addOnCompleteListener(addTask -> {
+                                    if (addTask.isSuccessful()) {
+                                        Toast.makeText(FeedbackActivity.this, "Feedback added successfully!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(FeedbackActivity.this, "Error: " + addTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
     }
+
+    // Hàm tạo ID ngẫu nhiên với độ dài tùy chỉnh
+    private String generateRandomId(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder id = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            id.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return id.toString();
+    }
+
+
 
 }

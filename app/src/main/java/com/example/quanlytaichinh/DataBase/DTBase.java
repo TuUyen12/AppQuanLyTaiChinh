@@ -297,6 +297,7 @@ public class DTBase {
 
         void onError(String errorMessage);
     }
+
     public void addFinancialForUser(Financial financial, int userId) {
         // Lấy ID tài chính mới từ Firebase
         getNewFinancialID(new FirebaseCallback<Integer>() {
