@@ -82,11 +82,23 @@ public class SignUpActivity extends AppCompatActivity {
                                             public void onCallback(Integer newUserId) {
                                                 if (newUserId != null) {
                                                     // Gọi hàm thêm mới với newUserId kiểu Integer
-                                                    dtBase.addNewUser(newUserId, username, password, email);
-                                                    Toast.makeText(SignUpActivity.this, "Register successfully!", Toast.LENGTH_LONG).show();
-                                                    initCategory(newUserId);
-                                                    Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
-                                                    startActivity(intent);
+                                                    mAuth.createUserWithEmailAndPassword(email, password)
+                                                            .addOnCompleteListener(SignUpActivity.this, task -> {
+                                                                if (task.isSuccessful()) {
+                                                                    // Đăng ký thành công
+                                                                    FirebaseUser user = mAuth.getCurrentUser();
+                                                                    dtBase.addNewUser(newUserId, username, email);
+                                                                    Toast.makeText(SignUpActivity.this, "Register successfully!", Toast.LENGTH_LONG).show();
+                                                                    initCategory(newUserId);
+                                                                    Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                } else {
+                                                                    // Đăng ký thất bại
+                                                                    Toast.makeText(SignUpActivity.this, "Failed to Sign Up", Toast.LENGTH_LONG).show();
+                                                                }
+                                                            });
+
                                                 } else {
                                                     Toast.makeText(SignUpActivity.this, "Failed to generate user ID", Toast.LENGTH_LONG).show();
                                                 }

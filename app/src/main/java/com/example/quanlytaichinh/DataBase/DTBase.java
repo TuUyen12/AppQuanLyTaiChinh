@@ -42,11 +42,11 @@ public class DTBase {
     }
 
     // Thêm người dùng mới vào Firebase
-    public void addNewUser(int newUserID, String username, String password, String email) {
-        String hashPass = hashPassword(password);
+    public void addNewUser(int newUserID, String username, String email) {
+
 
         // Tạo đối tượng User mới
-        User user = new User(newUserID, username, email, hashPass, "Male", " ", " ", 0);
+        User user = new User(newUserID, username, email, "Male", " ", " ", 0);
 
         // Lưu thông tin người dùng vào Firebase
         mDatabase.child("USERS").child(String.valueOf(newUserID)).setValue(user)
@@ -72,8 +72,8 @@ public class DTBase {
     }
 
     //Kiểm tra xem email người dùng và mật khẩu có khớp không
-    public void CheckSignIn(String userName, String userPass, SignInCallback callback) {
-        String hashPass = hashPassword(userPass);
+    public void CheckSignIn(String userName, SignInCallback callback) {
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("USERS");
         ref.orderByChild("userMail").equalTo(userName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -81,7 +81,7 @@ public class DTBase {
                 if (snapshot.exists()) {
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                         User user = userSnapshot.getValue(User.class);
-                        if (user != null && user.getUserPassword().equals(hashPass)) {
+                        if (user != null ) {
                             // Kiểm tra dữ liệu tài chính liên quan đến userID
                             fetchFinancialData(user.getUserID(), new FinancialCallback() {
                                 @Override
@@ -490,7 +490,6 @@ public class DTBase {
     public static class User implements Serializable {
         private int userID;
         private String userMail;
-        private String userPassword;
         private String userName;
         private String userGender;
         private String userBirthday; // Sử dụng String thay vì Date
@@ -501,10 +500,9 @@ public class DTBase {
             // Constructor mặc định cần thiết cho Firebase
         }
 
-        public User(int userID, String userName, String userMail, String userPassword, String userGender, String userBirthday, String userAddress, int userAvatar) {
+        public User(int userID, String userName, String userMail, String userGender, String userBirthday, String userAddress, int userAvatar) {
             this.userID = userID;
             this.userMail = userMail;
-            this.userPassword = userPassword;
             this.userName = userName;
             this.userGender = userGender;
             this.userBirthday = userBirthday;
@@ -527,14 +525,6 @@ public class DTBase {
 
         public void setUserMail(String userMail) {
             this.userMail = userMail;
-        }
-
-        public String getUserPassword() {
-            return userPassword;
-        }
-
-        public void setUserPassword(String userPassword) {
-            this.userPassword = userPassword;
         }
 
         public String getUserName() {

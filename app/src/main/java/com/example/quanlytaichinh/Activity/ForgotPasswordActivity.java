@@ -36,18 +36,18 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 String email = etEmail.getText().toString().trim();
 
                 if (email.isEmpty()) {
-                    Toast.makeText(ForgotPasswordActivity.this, "Vui lòng nhập địa chỉ email", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForgotPasswordActivity.this, "Please enter your email address", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // Gửi yêu cầu đặt lại mật khẩu
                 mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ForgotPasswordActivity.this, "Email đặt lại mật khẩu đã được gửi!", Toast.LENGTH_SHORT).show();
-                        finish(); // Đóng ForgotPassActivity
+                        Toast.makeText(ForgotPasswordActivity.this, "Password reset email has been sent!", Toast.LENGTH_SHORT).show();
+                        finish(); // Đóng ForgotPasswordActivity
                     } else {
                         String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error occurred";
-                        Toast.makeText(ForgotPasswordActivity.this, "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ForgotPasswordActivity.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
             }
