@@ -114,6 +114,10 @@ public class SettingFragment extends Fragment {
                     break;
                 case 2:
                     intent = new Intent(getActivity(), FeedbackActivity.class);
+                    // Truyền authUser qua Bundle
+                    Bundle bundle1 = new Bundle();
+                    bundle1.putSerializable("User", authUser);
+                    intent.putExtras(bundle1);
                     startActivity(intent);
                     break;
                 case 3:

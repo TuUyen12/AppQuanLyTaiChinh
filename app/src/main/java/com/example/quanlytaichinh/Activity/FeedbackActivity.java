@@ -22,8 +22,12 @@ public class FeedbackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.feedback_layout);
 
+        // Ánh xạ view
         feedbackEditText = findViewById(R.id.feedbackEditText);
         Button submitFeedbackButton = findViewById(R.id.submitFeedbackButton);
+
+        // Nhận thông tin người dùng từ Intent
+        authUser = (DTBase.User) getIntent().getSerializableExtra("User");
 
         submitFeedbackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,31 +36,32 @@ public class FeedbackActivity extends AppCompatActivity {
                 if (feedback.isEmpty()) {
                     Toast.makeText(FeedbackActivity.this, "Please enter your feedback!", Toast.LENGTH_SHORT).show();
                 } else {
-                    sendFeedbackEmail(feedback, authUser.getUserID());
+                    sendFeedbackEmail(feedback);
                 }
             }
         });
-        // Nhận từ Intent
-        authUser = (DTBase.User) getIntent().getSerializableExtra("User");
-
     }
 
-    private void sendFeedbackEmail(String feedback, int userId) {
-        String recipientEmail = "financialmanagementapp2024@gmail.com";  // Địa chỉ email nhận phản hồi
-        // Tiêu đề email
+    private void sendFeedbackEmail(String feedback) {
+        // Địa chỉ email nhận phản hồi
+        String recipientEmail = "financialmanagementapp2024@gmail.com";
 
-        String subject = "ID: " + userId + " - Feedback";  // Chủ đề email
+        // Chủ đề email
+        String subject = "ID: " + (authUser != null ? authUser.getUserID() : "Unknown") + " - Feedback";
 
-        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-        emailIntent.setData(Uri.parse("mailto:" + recipientEmail));
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        emailIntent.putExtra(Intent.EXTRA_TEXT, feedback);
+        // Intent để mở ứng dụng email
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("message/rfc822"); // Chỉ mở các ứng dụng email
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipientEmail}); // Địa chỉ email
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject); // Chủ đề
+        emailIntent.putExtra(Intent.EXTRA_TEXT, feedback); // Nội dung
 
-        // Kiểm tra nếu có ứng dụng email trên thiết bị
-        if (emailIntent.resolveActivity(getPackageManager()) != null) {
+        // Kiểm tra nếu có ứng dụng email khả dụng
+        try {
             startActivity(Intent.createChooser(emailIntent, "Choose an email client:"));
-        } else {
-            Toast.makeText(this, "Không tìm thấy ứng dụng email nào", Toast.LENGTH_SHORT).show();
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "No email app found on your device", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

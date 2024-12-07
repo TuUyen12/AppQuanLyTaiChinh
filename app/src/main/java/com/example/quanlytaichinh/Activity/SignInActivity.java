@@ -34,7 +34,6 @@ import java.util.List;
 
 public class SignInActivity extends AppCompatActivity {
 
-
     ArrayList<DTBase.Category> Category; // Danh sách hiện tại
     ArrayList<DTBase.Category> expense;
     ArrayList<DTBase.Category> income;
