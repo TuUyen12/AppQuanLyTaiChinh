@@ -103,7 +103,7 @@ public class ChartFragment extends Fragment {
         // Khởi tạo SharedPreferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
         // Lấy giá trị của `isPersonal`, với giá trị mặc định là `false` nếu biến chưa được lưu
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonnal", false);
+        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
         List<CalendarItem> calendarItems = new ArrayList<>();
 
         updateListView(lv_chart);

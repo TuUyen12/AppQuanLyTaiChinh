@@ -36,6 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:background="@drawable/custom_edittext"
+        android:inputType="textPersonName"
         android:drawablePadding="20dp"
         android:paddingLeft="20dp"/>
 
@@ -53,14 +54,15 @@
         android:id="@+id/et_email"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Enter email"
-        app:layout_constraintTop_toBottomOf="@id/tv_email"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:background="@drawable/custom_edittext"
         android:drawablePadding="20dp"
-        android:paddingLeft="20dp"/>
+        android:hint="Enter email"
+        android:inputType="textEmailAddress"
+        android:paddingLeft="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_email" />
 
     <TextView
         android:id="@+id/tv_birthday"
@@ -75,14 +77,15 @@
         android:id="@+id/et_birthday"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="1/1/2000"
-        app:layout_constraintTop_toBottomOf="@id/tv_birthday"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:background="@drawable/custom_edittext"
         android:drawablePadding="20dp"
-        android:paddingLeft="20dp"/>
+        android:hint="1/1/2000"
+        android:inputType="datetime"
+        android:paddingLeft="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_birthday" />
 
     <TextView
         android:id="@+id/tv_address"
@@ -97,14 +100,15 @@
         android:id="@+id/et_address"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Enter address:"
-        app:layout_constraintTop_toBottomOf="@id/tv_address"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:background="@drawable/custom_edittext"
         android:drawablePadding="20dp"
-        android:paddingLeft="20dp"/>
+        android:hint="Enter address:"
+        android:inputType="text"
+        android:paddingLeft="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_address" />
     <TextView
         android:id="@+id/tv_gender"
         android:layout_width="wrap_content"

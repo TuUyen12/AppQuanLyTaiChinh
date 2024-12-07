@@ -23,16 +23,14 @@
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
-        android:hint="Your Email"
-        app:layout_constraintTop_toBottomOf="@id/image_sign_in"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:drawableLeft="@drawable/mail_with_size"
-        android:inputType="textEmailAddress"
         android:background="@drawable/custom_edittext"
+        android:drawableLeft="@drawable/mail_with_size"
         android:drawablePadding="20dp"
-        android:paddingLeft="20dp">
-    </EditText>
+        android:hint="Your Email"
+        android:paddingLeft="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_sign_in"></EditText>
 
 
     <LinearLayout

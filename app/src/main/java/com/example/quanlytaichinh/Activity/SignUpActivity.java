@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlytaichinh.DataBase.DTBase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.example.quanlytaichinh.R;
 
 import java.util.ArrayList;
@@ -26,10 +28,14 @@ public class SignUpActivity extends AppCompatActivity {
     Button btn_sign_up;
     ImageButton ib_eye, ib_eye1;
 
+    private FirebaseAuth mAuth; // Firebase Authentication
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_layout);
+
+        mAuth = FirebaseAuth.getInstance();
 
         //Khởi tạo các thành phần giao diện
         et_username = findViewById(R.id.et_username);

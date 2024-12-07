@@ -65,6 +65,11 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+
+                // Truyền authUser qua Bundle
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("User", authUser);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });

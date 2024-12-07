@@ -37,6 +37,9 @@ public class DTBase {
         // Khởi tạo tham chiếu đến Realtime Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
+    public static DatabaseReference getDatabaseReference() {
+        return FirebaseDatabase.getInstance().getReference(); // Lấy đối tượng tham chiếu đến cơ sở dữ liệu gốc
+    }
 
     // Thêm người dùng mới vào Firebase
     public void addNewUser(int newUserID, String username, String password, String email) {
@@ -68,11 +71,11 @@ public class DTBase {
                 });
     }
 
-    //Kiểm tra xem tên người dùng và mật khẩu có khớp không
+    //Kiểm tra xem email người dùng và mật khẩu có khớp không
     public void CheckSignIn(String userName, String userPass, SignInCallback callback) {
         String hashPass = hashPassword(userPass);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("USERS");
-        ref.orderByChild("userName").equalTo(userName).addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.orderByChild("userMail").equalTo(userName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {

@@ -29,6 +29,7 @@
         android:drawableLeft="@drawable/user_with_size"
         android:background="@drawable/custom_edittext"
         android:drawablePadding="20dp"
+        android:inputType="textPersonName"
         android:paddingLeft="20dp">
     </EditText>
 
