@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -26,48 +27,58 @@ import androidx.fragment.app.Fragment;
 import com.example.quanlytaichinh.CalendarAdapter;
 import com.example.quanlytaichinh.CalendarItem;
 import com.example.quanlytaichinh.CustomSpinnerAdapter;
+import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChartFragment extends Fragment {
     private PieChart pieChart;
     private LinearLayout linearLayout;
-    private TextView selectedYearTextView;
-    private String currentType = "expense"; // Default type
-    private boolean isMonthlyView = false; // View state
+    private TextView selectedYearTextView,
+            selectedMonthTextView;
+    private String currentType = "Expense"; // mặc định
+    private boolean isMonthlyView = true; // Mặc định khi mở lên hiển thị tháng
     private ImageButton ibMonth;
     private ImageButton ibYear;
+    private ListView lv_chart;
+    private Spinner spinner;
+    private HorizontalScrollView horizontalScrollView;
+
+    private boolean isPersonal;
+    private String categoryJson;
+    private String financialJson;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.chart_layout, container, false);
-        Spinner spinner = view.findViewById(R.id.spinner_type);
+        setupSharedPreferences();
+        initVariable(view);
 
+        // Spinner chọn expense hay income
         String[] typeOptions = {"Expense", "Income"};
         CustomSpinnerAdapter adapter = new CustomSpinnerAdapter(requireContext(), typeOptions);
         spinner.setAdapter(adapter);
-        spinner.setSelection(0); // Default selection
+        spinner.setSelection(0); // mặc định là expense
 
-        ibMonth = view.findViewById(R.id.ib_month);
-        ibYear = view.findViewById(R.id.ib_year);
-        ibMonth.setImageResource(R.drawable.month1_with_size);
-        ibYear.setImageResource(R.drawable.year_with_size);
-
-        linearLayout = view.findViewById(R.id.linearLayout);
-        pieChart = view.findViewById(R.id.pieChart);
-        ListView lv_chart = view.findViewById(R.id.lv_chart);
-
-        // Set up the year selection
-        setupYearSelection();
+        updateView();
+        int time = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        getUserPieData(time, isMonthlyView);
+        setupPieChart(pieChart, getUserPieData(time, isMonthlyView));
 
         // Month
         ibMonth.setOnClickListener(v -> {
@@ -76,8 +87,6 @@ public class ChartFragment extends Fragment {
             Toast.makeText(getContext(), "Changed to Monthly view", Toast.LENGTH_SHORT).show();
             updateView();
         });
-
-
         ibYear.setOnClickListener(v -> {
             isMonthlyView = false;
             Log.d("ChartFragment", "Yearly view selected");
@@ -90,9 +99,12 @@ public class ChartFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 adapter.setSelectedPosition(position);
-                currentType = typeOptions[position];
-                updateListView(lv_chart); // Cập nhật ListView khi chọn loại mới
-                showData();
+
+                currentType = position == 0 ? "Expense" : "Income"; // 0 : Expense, 1 : Income
+
+                int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
+                ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+                setupPieChart(pieChart, pieEntries);
             }
 
             @Override
@@ -100,19 +112,10 @@ public class ChartFragment extends Fragment {
             }
         });
 
-        // Khởi tạo SharedPreferences
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        // Lấy giá trị của `isPersonal`, với giá trị mặc định là `false` nếu biến chưa được lưu
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
-        List<CalendarItem> calendarItems = new ArrayList<>();
-
-        updateListView(lv_chart);
-
         lv_chart.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                ShowChooseEdit_Delete();
                 return false;
             }
         });
@@ -120,158 +123,236 @@ public class ChartFragment extends Fragment {
         return view;
     }
 
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        isPersonal = sharedPreferences.getBoolean("isPersonal", false);
+        SharedPreferences categorySharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
+        categoryJson = categorySharedPreferences.getString("category", "[]");
+        SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+        financialJson = financialSharedPreferences.getString("financialList", "[]");
+    }
+
     private void setupYearSelection() {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int year = 2000; year <= 2024; year++) {
-            TextView textView = createYearTextView(year);
+        for (int year = currentYear; year >= 2004; year--) {
+            TextView textView = createTextView(year);
             if (year == currentYear) {
                 selectedYearTextView = textView;
                 selectedYearTextView.setBackgroundColor(Color.LTGRAY);
-                showData(); // Show current year's data
+            }
+            linearLayout.addView(textView);
+        }
+    }
+    private void setupMonthSelection() {
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        for (int month = 0; month < 12; month++) {
+            TextView textView = createTextView(month + 1);
+            if (month == currentMonth) {
+                selectedMonthTextView = textView;
+                selectedMonthTextView.setBackgroundColor(Color.LTGRAY);
             }
             linearLayout.addView(textView);
         }
     }
 
-    private TextView createYearTextView(int year) {
+    private void initVariable(View view){
+
+
+        ibMonth = view.findViewById(R.id.ib_month);
+        ibYear = view.findViewById(R.id.ib_year);
+        ibMonth.setImageResource(R.drawable.month_with_size);
+        ibYear.setImageResource(R.drawable.year1_with_size);
+        linearLayout = view.findViewById(R.id.linearLayout);
+        pieChart = view.findViewById(R.id.pieChart);
+        lv_chart = view.findViewById(R.id.lv_chart);
+        spinner = view.findViewById(R.id.spinner_type);
+        horizontalScrollView = view.findViewById(R.id.horizontalScrollView);
+    }
+
+    private TextView createTextView(int time) {
         TextView textView = new TextView(getContext());
         textView.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
-        textView.setText(String.valueOf(year));
+        textView.setText(String.valueOf(time));
         textView.setPadding(20, 20, 20, 20);
         textView.setTextSize(18);
         textView.setOnClickListener(v -> {
-            if (selectedYearTextView != null) {
-                selectedYearTextView.setBackgroundColor(Color.TRANSPARENT);
+            if (isMonthlyView) {
+                if (selectedMonthTextView != null) {
+                    selectedMonthTextView.setBackgroundColor(Color.TRANSPARENT);
+                }
+                selectedMonthTextView = textView;
+
+            } else {
+                if (selectedYearTextView != null) {
+                    selectedYearTextView.setBackgroundColor(Color.TRANSPARENT);
+                }
+                selectedYearTextView = textView;
             }
-            selectedYearTextView = textView;
-            selectedYearTextView.setBackgroundColor(Color.LTGRAY);
-            showData(); // Update data for selected year
+            textView.setBackgroundColor(Color.LTGRAY);
+            getUserPieData(time, isMonthlyView);
+            setupPieChart(pieChart, getUserPieData(time, isMonthlyView));
         });
         return textView;
     }
 
+    //Thêm dữ liệu cho PieChart
+    private ArrayList<PieEntry> getUserPieData(int time, boolean isMonthlyView) {
+        Gson gson = new Gson();
+        Type categoryType = new TypeToken<List<DTBase.Category>>() {}.getType();
+        List<DTBase.Category> categoryList = gson.fromJson(categoryJson, categoryType);
+        ArrayList<PieEntry> pieEntries = new ArrayList<>();
+
+        if (financialJson != null) {
+            Type financialType = new TypeToken<List<DTBase.Financial>>() {}.getType();
+            List<DTBase.Financial> financialList = gson.fromJson(financialJson, financialType);
+
+            HashMap<Integer, Float> categoryAmountMap = new HashMap<>();
+
+            // Duyệt qua danh sách chi tiêu hoặc thu nhập
+            for (DTBase.Financial financial : financialList) {
+                if (currentType.equals("Expense")) { // Loại chi tiêu
+                    if (isMonthlyView) {
+                        if (isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() < 9) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        } else if (!isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() >= 20) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    } else { // Chế độ xem theo năm
+                        if (isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() < 9) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        } else if (!isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() >= 20) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    }
+                } else if (currentType.equals("Income")) { // Loại thu nhập
+                    if (isMonthlyView) {
+                        if (isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() > 8 && financial.getCategoryID() < 20) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        } else if (!isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() > 26) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    } else {
+                        if (isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() > 8 && financial.getCategoryID() < 20) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        } else if (!isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() > 26) {
+                            categoryAmountMap.put(
+                                    financial.getCategoryID(),
+                                    categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Chuyển đổi dữ liệu thành PieEntry
+            for (Map.Entry<Integer, Float> entry : categoryAmountMap.entrySet()) {
+                int categoryID = entry.getKey();
+                float amount = entry.getValue();
+
+                for (DTBase.Category category : categoryList) {
+                    if (category.getCategoryID() == categoryID) {
+                        pieEntries.add(new PieEntry(amount, category.getCategoryName()));
+                    }
+                }
+            }
+        }
+
+        return pieEntries;
+    }
+
     private void updateView() {
-        linearLayout.removeAllViews(); // Clear previous views before adding new ones
+        linearLayout.removeAllViews();
         if (isMonthlyView) {
             ibMonth.setImageResource(R.drawable.month_with_size);
             ibYear.setImageResource(R.drawable.year1_with_size);
-            for (int month = 1; month <= 12; month++) {
-                TextView monthTextView = createMonthTextView(month);
-                linearLayout.addView(monthTextView);
-            }
+            setupMonthSelection();
         } else {
             ibMonth.setImageResource(R.drawable.month1_with_size);
             ibYear.setImageResource(R.drawable.year_with_size);
             setupYearSelection();
         }
-        showData(); // Refresh data after changing view
+
     }
 
+    // Hàm thiết lập màu sắc PieChart
+    private void setupPieChart(PieChart pieChart, ArrayList<PieEntry> userPieEntries) {
+        PieDataSet pieDataSet = new PieDataSet(userPieEntries, "");
 
-    private TextView createMonthTextView(int month) {
-        TextView textView = new TextView(getContext());
-        textView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        textView.setText(String.valueOf(month));
-        textView.setPadding(20, 20, 20, 20);
-        textView.setTextSize(18);
-        textView.setOnClickListener(v -> {
-            // Handle month selection if needed
-        });
-        return textView;
-    }
+        // Màu cho các phần của PieChart
+        ArrayList<Integer> pieColors = new ArrayList<>();
+        pieColors.add(getResources().getColor(R.color.color1));
+        pieColors.add(getResources().getColor(R.color.color2));
+        pieColors.add(getResources().getColor(R.color.color3));
+        pieColors.add(getResources().getColor(R.color.color4));
+        pieColors.add(getResources().getColor(R.color.color5));
+        pieColors.add(getResources().getColor(R.color.color6));
+        pieColors.add(getResources().getColor(R.color.color7));
+        pieColors.add(getResources().getColor(R.color.color8));
+        pieColors.add(getResources().getColor(R.color.color9));
+        pieColors.add(getResources().getColor(R.color.color10));
 
-    private void showData() {
-        if (selectedYearTextView != null) {
-            String year = selectedYearTextView.getText().toString();
-            showYearData(year);
-        }
-    }
+        // Thiết lập màu sắc cho các phần
+        pieDataSet.setColors(pieColors);
 
-    private void showYearData(String year) {
-        ArrayList<PieEntry> pieEntries = new ArrayList<>();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonnal", false);
-
-        if (currentType.equals("Expense")) {
-            if (isPersonal) {
-                pieEntries.add(new PieEntry(25f, "Bill"));
-                pieEntries.add(new PieEntry(15f, "Education"));
-                pieEntries.add(new PieEntry(30f, "Food"));
-                pieEntries.add(new PieEntry(30f, "Other"));
-            } else {
-                pieEntries.add(new PieEntry(15f, "Marketing"));
-                pieEntries.add(new PieEntry(15f, "Maintenance"));
-                pieEntries.add(new PieEntry(30f, "Project Costs"));
-                pieEntries.add(new PieEntry(20f, "Personnel Costs"));
-            }
-        } else if (currentType.equals("Income")) {
-            pieEntries.add(new PieEntry(40f, "Salary"));
-            pieEntries.add(new PieEntry(30f, "Investments"));
-            pieEntries.add(new PieEntry(20f, "Freelancing"));
-            pieEntries.add(new PieEntry(10f, "Other"));
-        }
-
-        updateChartDataBasedOnType(currentType, pieEntries, year);
-    }
+        pieDataSet.setValueTextColor(Color.BLACK);
+        pieDataSet.setValueTextSize(16f);
+        pieDataSet.setValueFormatter(new PercentFormatter());
+        pieDataSet.setSliceSpace(3f);
 
 
-    private void updateChartDataBasedOnType(String type, ArrayList<PieEntry> pieEntries, String year) {
-        PieDataSet dataSet = new PieDataSet(pieEntries, isMonthlyView ? "Data for " + " (Month)" : "Data for " +" (Year)");
-        ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.color1));
-        colors.add(getResources().getColor(R.color.color2));
-        colors.add(getResources().getColor(R.color.color3));
-        colors.add(getResources().getColor(R.color.color4));
+        // Tạo dữ liệu cho PieChart
+        PieData pieData = new PieData(pieDataSet);
+        pieChart.setData(pieData);
 
-        dataSet.setColors(colors);
-        dataSet.setValueTextColor(Color.TRANSPARENT);
-        dataSet.setValueTextSize(0f);
-        dataSet.setSliceSpace(3f);
+        // Ẩn giá trị và nhãn hiển thị trên biểu đồ
+        pieDataSet.setValueTextColor(Color.TRANSPARENT); // Ẩn số liệu
+        pieDataSet.setValueTextSize(0f); // Không hiển thị kích thước văn bản
+        pieDataSet.setSliceSpace(3f);
 
+        // Ẩn nhãn tên loại chi phí trong các phần của PieChart
         pieChart.setDrawEntryLabels(false);
-        pieChart.getDescription().setEnabled(false);
 
+        // Thiết lập chú thích (Legend)
         Legend legend = pieChart.getLegend();
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         legend.setOrientation(Legend.LegendOrientation.VERTICAL);
-        legend.setDrawInside(false);
+        legend.setDrawInside(false); // Chú thích nằm bên ngoài biểu đồ
         legend.setTextColor(Color.BLACK);
         legend.setTextSize(12f);
 
-        pieChart.setData(new PieData(dataSet));
-        pieChart.animateY(1400);
-        pieChart.invalidate(); // Refresh the chart
-    }
-    // Thêm phương thức updateListView() để cập nhật ListView
-    private void updateListView(ListView lv_chart) {
-        List<CalendarItem> calendarItems = new ArrayList<>();
+        // Điều chỉnh khoảng cách giữa legend và pie chart
+        legend.setYOffset(30f);
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        boolean isPersonal = sharedPreferences.getBoolean("isPersonal", false);
+        // Ẩn tiêu đề của PieChart
+        pieChart.getDescription().setEnabled(false);
 
+        pieChart.invalidate(); // Làm mới PieChart
     }
 
-    private void ShowChooseEdit_Delete(){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Edit or Delete");
-        // Xử lý sự kiện khi người dùng chọn Edit
-
-        builder.setPositiveButton("Edit", (dialog, which) -> {
-            //Sự kiện sửa
-
-        });
-        // Xử lý sự kiện khi người dùng chọn Delete
-        builder.setNegativeButton("Delete", (dialog, which) -> {
-
-        });
-        // Hiển thị dialog
-        builder.create().show();
-    }
 
 }

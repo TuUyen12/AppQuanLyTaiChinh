@@ -582,7 +582,7 @@ public class DTBase {
         public Financial() {
             Date date = new Date();
             // Tạo một đối tượng SimpleDateFormat với định dạng ngày tháng bạn muốn
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  // Định dạng: năm-tháng-ngày
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");  // Định dạng: năm-tháng-ngày
 
             // Chuyển đổi Date thành String
             financialDate = sdf.format(date);
@@ -626,6 +626,34 @@ public class DTBase {
         public String getFinancialDate(){
             return financialDate;
         }
+        public int getFinancialMonth() {
+            if (financialDate != null && financialDate.length() >= 5) {
+                String[] dateParts = financialDate.split("/"); // Tách chuỗi theo ký tự "/"
+                try {
+                    return Integer.parseInt(dateParts[1]); // Lấy phần tử thứ 2 (tháng) và chuyển sang int
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                    return -1; // Trả về -1 nếu lỗi
+                }
+            } else {
+                return -1; // Trả về -1 nếu ngày không hợp lệ
+            }
+        }
+        public int getFinancialYear(){
+            if (financialDate != null && financialDate.length() >= 5) {
+                String[] dateParts = financialDate.split("/"); // Tách chuỗi theo ký tự "/"
+                try {
+                    return Integer.parseInt(dateParts[2]); // Lấy phần tử thứ 3 (năm) và chuyển sang int
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    e.printStackTrace();
+                    return -1; // Trả về -1 nếu lỗi
+
+                }
+            } else {
+                return -1; // Trả về -1 nếu ngày không hợp lệ
+            }
+        }
+
         public int getUserID() {
             return userID;
         }
