@@ -2,6 +2,7 @@ package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -39,8 +40,11 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,9 +80,6 @@ public class ChartFragment extends Fragment {
         spinner.setSelection(0); // mặc định là expense
 
         updateView();
-        int time = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        getUserPieData(time, isMonthlyView);
-        setupPieChart(pieChart, getUserPieData(time, isMonthlyView));
 
         // Month
         ibMonth.setOnClickListener(v -> {
@@ -183,7 +184,6 @@ public class ChartFragment extends Fragment {
                     selectedMonthTextView.setBackgroundColor(Color.TRANSPARENT);
                 }
                 selectedMonthTextView = textView;
-
             } else {
                 if (selectedYearTextView != null) {
                     selectedYearTextView.setBackgroundColor(Color.TRANSPARENT);
@@ -191,11 +191,15 @@ public class ChartFragment extends Fragment {
                 selectedYearTextView = textView;
             }
             textView.setBackgroundColor(Color.LTGRAY);
-            getUserPieData(time, isMonthlyView);
-            setupPieChart(pieChart, getUserPieData(time, isMonthlyView));
+
+            // Cập nhật lại PieChart và ListView
+            getUserPieData(time, isMonthlyView);  // Lấy dữ liệu mới
+            setupPieChart(pieChart, getUserPieData(time, isMonthlyView));  // Cập nhật PieChart
         });
         return textView;
     }
+
+
 
     //Thêm dữ liệu cho PieChart
     private ArrayList<PieEntry> getUserPieData(int time, boolean isMonthlyView) {
@@ -203,6 +207,8 @@ public class ChartFragment extends Fragment {
         Type categoryType = new TypeToken<List<DTBase.Category>>() {}.getType();
         List<DTBase.Category> categoryList = gson.fromJson(categoryJson, categoryType);
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
+        ArrayList<DTBase.Financial> calendarItems = new ArrayList<>();
+
 
         if (financialJson != null) {
             Type financialType = new TypeToken<List<DTBase.Financial>>() {}.getType();
@@ -219,11 +225,13 @@ public class ChartFragment extends Fragment {
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         } else if (!isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() >= 20) {
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         }
                     } else { // Chế độ xem theo năm
                         if (isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() < 9) {
@@ -231,11 +239,13 @@ public class ChartFragment extends Fragment {
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         } else if (!isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() >= 20) {
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         }
                     }
                 } else if (currentType.equals("Income")) { // Loại thu nhập
@@ -245,11 +255,13 @@ public class ChartFragment extends Fragment {
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         } else if (!isPersonal && financial.getFinancialMonth() == time && financial.getCategoryID() > 26) {
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         }
                     } else {
                         if (isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() > 8 && financial.getCategoryID() < 20) {
@@ -257,11 +269,13 @@ public class ChartFragment extends Fragment {
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
+                            calendarItems.add(financial);
                         } else if (!isPersonal && financial.getFinancialYear() == time && financial.getCategoryID() > 26) {
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
-                            );
+                            );calendarItems.add(financial);
+
                         }
                     }
                 }
@@ -278,6 +292,15 @@ public class ChartFragment extends Fragment {
                     }
                 }
             }
+        }
+
+        lv_chart.setAdapter(null);
+        CalendarAdapter adapter = new CalendarAdapter(getContext(), calendarItems);
+        // Cập nhật lại ListView
+        if (calendarItems != null && !calendarItems.isEmpty()) {
+            lv_chart.setAdapter(adapter);
+        } else {
+            Toast.makeText(getActivity(), "No financial data available for the selected date", Toast.LENGTH_SHORT).show();
         }
 
         return pieEntries;
@@ -352,7 +375,5 @@ public class ChartFragment extends Fragment {
 
         pieChart.invalidate(); // Làm mới PieChart
     }
-
-
 
 }
