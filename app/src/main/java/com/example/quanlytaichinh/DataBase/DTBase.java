@@ -485,6 +485,34 @@ public class DTBase {
                 });
     }
 
+    public int getFinancialMonth(Financial financial) {
+        if (financial.getFinancialDate() != null && financial.getFinancialDate().length() >= 5) {
+            String[] dateParts = financial.getFinancialDate().split("/"); // Tách chuỗi theo ký tự "/"
+            try {
+                return Integer.parseInt(dateParts[1]); // Lấy phần tử thứ 2 (tháng) và chuyển sang int
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+                return -1; // Trả về -1 nếu lỗi
+            }
+        } else {
+            return -1; // Trả về -1 nếu ngày không hợp lệ
+        }
+    }
+    public int getFinancialYear(Financial financial){
+        if (financial.getFinancialDate() != null && financial.getFinancialDate().length() >= 5) {
+            String[] dateParts = financial.getFinancialDate().split("/"); // Tách chuỗi theo ký tự "/"
+            try {
+                return Integer.parseInt(dateParts[2]); // Lấy phần tử thứ 3 (năm) và chuyển sang int
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+                return -1; // Trả về -1 nếu lỗi
+
+            }
+        } else {
+            return -1; // Trả về -1 nếu ngày không hợp lệ
+        }
+    }
+
 
 
     //User
@@ -625,33 +653,6 @@ public class DTBase {
         }
         public String getFinancialDate(){
             return financialDate;
-        }
-        public int getFinancialMonth() {
-            if (financialDate != null && financialDate.length() >= 5) {
-                String[] dateParts = financialDate.split("/"); // Tách chuỗi theo ký tự "/"
-                try {
-                    return Integer.parseInt(dateParts[1]); // Lấy phần tử thứ 2 (tháng) và chuyển sang int
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                    return -1; // Trả về -1 nếu lỗi
-                }
-            } else {
-                return -1; // Trả về -1 nếu ngày không hợp lệ
-            }
-        }
-        public int getFinancialYear(){
-            if (financialDate != null && financialDate.length() >= 5) {
-                String[] dateParts = financialDate.split("/"); // Tách chuỗi theo ký tự "/"
-                try {
-                    return Integer.parseInt(dateParts[2]); // Lấy phần tử thứ 3 (năm) và chuyển sang int
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                    return -1; // Trả về -1 nếu lỗi
-
-                }
-            } else {
-                return -1; // Trả về -1 nếu ngày không hợp lệ
-            }
         }
 
         public int getUserID() {
