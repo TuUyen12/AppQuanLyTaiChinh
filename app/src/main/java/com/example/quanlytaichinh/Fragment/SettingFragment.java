@@ -20,10 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.quanlytaichinh.Activity.FeedbackActivity;
-import com.example.quanlytaichinh.Activity.GeneralActivity;
 import com.example.quanlytaichinh.Activity.GuidingInformationActivity;
-import com.example.quanlytaichinh.Activity.SignInActivity;
-import com.example.quanlytaichinh.Activity.TimeSettingActivity;
 import com.example.quanlytaichinh.DataBase.DTBase;
 import com.example.quanlytaichinh.R;
 import com.example.quanlytaichinh.SettingAdapter;
@@ -49,10 +46,16 @@ public class SettingFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.setting_layout, container, false);
 
+        authUser = getUserFromSharedPreferences();
+        if (authUser != null) {
+            TextView tv_account = view.findViewById(R.id.tv_account);
+            tv_account.setText(authUser.getUserMail()); // Hiển thị email
+            userId = authUser.getUserID();
 
+        }
         RelativeLayout accountLayout = view.findViewById(R.id.account_layout);
 
         // Thiết lập sự kiện click cho RelativeLayout
@@ -73,25 +76,11 @@ public class SettingFragment extends Fragment {
                     .commit();
         });
 
-        // Nhận dữ liệu từ Bundle
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            authUser = (DTBase.User) bundle.getSerializable("User"); // Ép kiểu về User
-
-            if (authUser != null) {
-                TextView tv_account = view.findViewById(R.id.tv_account);
-                tv_account.setText(authUser.getUserMail()); // Hiển thị email
-                userId = authUser.getUserID();
-
-            }
-        }
-
 
         ListView lvSetting = view.findViewById(R.id.lv_setting);
 
         // Tạo danh sách các item setting
         List<SettingItem> settingItems = new ArrayList<>();
-        settingItems.add(new SettingItem("Time Setting", R.drawable.time_with_size));
         settingItems.add(new SettingItem("Guiding and Information", R.drawable.guide_with_size));
         settingItems.add(new SettingItem("Feedback", R.drawable.feedback_with_size));
         settingItems.add(new SettingItem("Account Type", R.drawable.exchange_with_size));
@@ -105,14 +94,10 @@ public class SettingFragment extends Fragment {
             Intent intent;
             switch (position) {
                 case 0: // Time Setting
-                    intent = new Intent(getActivity(), TimeSettingActivity.class);
-                    startActivity(intent);
-                    break;
-                case 1:
                     intent = new Intent(getActivity(), GuidingInformationActivity.class);
                     startActivity(intent);
                     break;
-                case 2:
+                case 1:
                     intent = new Intent(getActivity(), FeedbackActivity.class);
                     // Truyền authUser qua Bundle
                     Bundle bundle1 = new Bundle();
@@ -120,7 +105,7 @@ public class SettingFragment extends Fragment {
                     intent.putExtras(bundle1);
                     startActivity(intent);
                     break;
-                case 3:
+                case 2:
                     // Khởi tạo SharedPreferences
                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
                     // Lấy giá trị của `isPersonal`, với giá trị mặc định là `false` nếu biến chưa được lưu
@@ -128,6 +113,7 @@ public class SettingFragment extends Fragment {
                     // Hiển thị dialog chọn loại tài khoản
                     showAccountTypeDialog(isPersonal);
                     break;
+
                 default:
                     break;
             }
@@ -135,6 +121,22 @@ public class SettingFragment extends Fragment {
 
         return view;
     }
+    private DTBase.User getUserFromSharedPreferences() {
+        // Lấy SharedPreferences
+        SharedPreferences userSharedPreferences = getActivity().getSharedPreferences("MyUser", MODE_PRIVATE);
+
+        // Lấy chuỗi JSON từ SharedPreferences
+        String userJson = userSharedPreferences.getString("userJson", null);
+
+        // Nếu JSON không null, chuyển đổi thành đối tượng User
+        if (userJson != null) {
+            Gson gson = new Gson();
+            return gson.fromJson(userJson, DTBase.User.class);
+        }
+
+        return null; // Nếu không tìm thấy JSON, trả về null
+    }
+
     private void showAccountTypeDialog(boolean isPersonal) {
         // Tạo danh sách các tùy chọn loại tài khoản
         String[] accountTypes = {"Personal", "Business"};

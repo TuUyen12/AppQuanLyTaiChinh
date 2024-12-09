@@ -23,6 +23,7 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     ArrayList<DTBase.Category> Category; // Danh sách cho cả income và expense
+    ArrayList<DTBase.Financial> Financial;
 
     EditText et_username, et_email, et_password, et_confirm_password;
     Button btn_sign_up;
@@ -162,6 +163,7 @@ public class SignUpActivity extends AppCompatActivity {
         dtBase.addListCategorytoFirebase(Category, userId);
 
     }
+    
 
     // Phương thức hiển thị mật khẩu
     private void setPasswordVisibilityToggle(ImageButton ib_eye, EditText editText) {

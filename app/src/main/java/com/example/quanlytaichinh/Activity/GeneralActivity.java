@@ -67,6 +67,12 @@ public class GeneralActivity extends AppCompatActivity {
                         break;
                     case 3:
                         selectedFragment = new ChartFragment();
+                        Bundle bundle2 = new Bundle();
+                        bundle2.putSerializable("User", authUser);
+                        selectedFragment.setArguments(bundle2);
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, selectedFragment)
+                                .commit();
                         break;
                     case 4:
                         // Tạo đối tượng SettingFragment và truyền dữ liệu

@@ -46,7 +46,7 @@ public class DTBase {
 
 
         // Tạo đối tượng User mới
-        User user = new User(newUserID, username, email, "Male", " ", " ", 0);
+        User user = new User(newUserID, username, email, "Male", " ", " ");
 
         // Lưu thông tin người dùng vào Firebase
         mDatabase.child("USERS").child(String.valueOf(newUserID)).setValue(user)
@@ -113,21 +113,6 @@ public class DTBase {
         void onSignInResult(boolean success, User user, List<Financial> financialList);
     }
 
-    // Hàm băm mật khẩu để mã hóa
-    public static String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = digest.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hashedBytes) {
-                hexString.append(String.format("%02x", b));
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     // Kiểm tra sự tồn tại của tên người dùng
     public void isUserNameExists(String username, FirebaseCallback<Boolean> callback) {
@@ -187,6 +172,7 @@ public class DTBase {
             }
         });
     }
+
 
     // Tăng giá trị NewUserID
     public void incrementNewUserID(IncrementCallback callback) {
@@ -523,20 +509,19 @@ public class DTBase {
         private String userGender;
         private String userBirthday; // Sử dụng String thay vì Date
         private String userAddress;
-        private int userAvatar;
 
         public User() {
             // Constructor mặc định cần thiết cho Firebase
         }
 
-        public User(int userID, String userName, String userMail, String userGender, String userBirthday, String userAddress, int userAvatar) {
+        public User(int userID, String userName, String userMail, String userGender, String userBirthday, String userAddress) {
             this.userID = userID;
             this.userMail = userMail;
             this.userName = userName;
             this.userGender = userGender;
             this.userBirthday = userBirthday;
             this.userAddress = userAddress;
-            this.userAvatar = userAvatar;
+
         }
 
         // Getter và Setter cho tất cả các thuộc tính
@@ -588,13 +573,6 @@ public class DTBase {
             this.userAddress = userAddress;
         }
 
-        public int getUserAvatar() {
-            return userAvatar;
-        }
-
-        public void setUserAvatar(int userAvatar) {
-            this.userAvatar = userAvatar;
-        }
     }
     //Financial
     public static class Financial {

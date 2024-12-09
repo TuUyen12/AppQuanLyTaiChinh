@@ -3,6 +3,7 @@ package com.example.quanlytaichinh.Fragment;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -65,6 +66,10 @@ public class ChartFragment extends Fragment {
     private boolean isPersonal;
     private String categoryJson;
     private String financialJson;
+    private DTBase.User authUser;
+    private int userId;
+    private CalendarAdapter adapter;
+    private List<DTBase.Financial> userFinancialList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -79,6 +84,18 @@ public class ChartFragment extends Fragment {
         spinner.setAdapter(adapter);
         spinner.setSelection(0); // mặc định là expense
 
+        // Nhận dữ liệu từ Bundle
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            authUser = (DTBase.User) bundle.getSerializable("User");
+            if (authUser != null) {
+                userId = authUser.getUserID();
+                Log.d("ChartFragment", "User ID: " + userId);
+            } else {
+                // Gán giá trị mặc định nếu authUser là null
+                userId = -1; // Hoặc giá trị hợp lệ tùy theo yêu cầu của bạn
+            }
+        }
         updateView();
 
         // Month
@@ -87,12 +104,18 @@ public class ChartFragment extends Fragment {
             Log.d("ChartFragment", "Monthly view selected");
             Toast.makeText(getContext(), "Changed to Monthly view", Toast.LENGTH_SHORT).show();
             updateView();
+            int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
+            ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+            setupPieChart(pieChart, pieEntries);
         });
         ibYear.setOnClickListener(v -> {
             isMonthlyView = false;
             Log.d("ChartFragment", "Yearly view selected");
             Toast.makeText(getContext(), "Changed to Yearly view", Toast.LENGTH_SHORT).show();
             updateView();
+            int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
+            ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+            setupPieChart(pieChart, pieEntries);
         });
 
         // Spinner
@@ -117,7 +140,17 @@ public class ChartFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                return false;
+                // Lấy đối tượng Financial tại vị trí "position"
+                DTBase.Financial financialItem = (DTBase.Financial) adapterView.getItemAtPosition(i);
+
+                // Lấy financialID từ đối tượng Financial
+                int financialID = financialItem.getFinancialID();
+                int userID = financialItem.getUserID();
+                // Gọi hàm xử lý Edit/Delete với financialID
+
+                ShowDelete(userID, financialID);
+
+                return true; // Trả về true để sự kiện được xử lý và không tiếp tục với các hành động khác
             }
         });
 
@@ -157,8 +190,6 @@ public class ChartFragment extends Fragment {
     }
 
     private void initVariable(View view){
-
-
         ibMonth = view.findViewById(R.id.ib_month);
         ibYear = view.findViewById(R.id.ib_year);
         ibMonth.setImageResource(R.drawable.month_with_size);
@@ -209,7 +240,6 @@ public class ChartFragment extends Fragment {
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
         ArrayList<DTBase.Financial> calendarItems = new ArrayList<>();
         DTBase dtBase = new DTBase();
-
 
         if (financialJson != null) {
             Type financialType = new TypeToken<List<DTBase.Financial>>() {}.getType();
@@ -319,6 +349,7 @@ public class ChartFragment extends Fragment {
             setupYearSelection();
         }
 
+
     }
 
     // Hàm thiết lập màu sắc PieChart
@@ -375,6 +406,72 @@ public class ChartFragment extends Fragment {
         pieChart.getDescription().setEnabled(false);
 
         pieChart.invalidate(); // Làm mới PieChart
+    }
+
+    // Hàm xử lý sự kiện chọn Delete
+    private void ShowDelete(int userID, int financialID) {
+        if (userID <= 0 || financialID <= 0) {
+            Toast.makeText(getActivity(), "Invalid data. Cannot delete." + userID + " " + financialID, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String message = "Do you want to delete?";
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Delete")
+                .setMessage(message)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Tạo đối tượng DTBase để xóa dữ liệu
+                    DTBase database = new DTBase();
+                    database.deleteFinancial(userID, financialID);
+
+                    // Cập nhật lại ListView
+                    updateListView(); // Gọi hàm cập nhật lại ListView
+
+                    // Cập nhật SharedPreferences
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.clear();
+                    editor.apply();
+
+                    // Thông báo sau khi xóa thành công
+                    Toast.makeText(getActivity(), "Deleted successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Đóng dialog khi người dùng chọn "No"
+                    dialog.dismiss();
+                });
+
+        builder.create().show();
+    }
+    private void updateListView() {
+        DTBase db = new DTBase();
+        // Lấy dữ liệu tài chính từ Firebase
+        db.fetchFinancialData(userId, new DTBase.FinancialCallback() {
+            @Override
+            public void onFinancialDataFetched(List<DTBase.Financial> financialList) {
+                if (financialList != null) {
+                    userFinancialList.addAll(financialList);
+
+                    // Khi dữ liệu tài chính đã tải xong, lưu vào SharedPreferences
+                    SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyFinancials", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userFinancialList);
+                    editor.putString("financialList", json);
+                    editor.apply();
+                    int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
+                    ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+                    setupPieChart(pieChart, pieEntries);
+                } else {
+                    Toast.makeText(getActivity(), "Error loading financial data", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getActivity(), "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

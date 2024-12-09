@@ -45,11 +45,8 @@ public class AccountFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             authUser = (DTBase.User) bundle.getSerializable("User");
-            if (authUser != null) {
 
-            }
         }
-
         btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +78,15 @@ public class AccountFragment extends Fragment {
                 ShowChooseSignOut();
             }
         });
+        // Khi thực hiện quay lại từ AccountFragment về SettingFragment-> truyền bundle về
+        SettingFragment settingFragment = new SettingFragment();
+
+        // Truyền authUser qua Bundle
+        Bundle bundle1 = new Bundle();
+        if (authUser != null) {
+            bundle1.putSerializable("User", authUser);
+        }
+        settingFragment.setArguments(bundle1);
 
         return view;
     }

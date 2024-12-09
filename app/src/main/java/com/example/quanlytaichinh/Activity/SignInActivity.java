@@ -1,5 +1,7 @@
 package com.example.quanlytaichinh.Activity;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -108,6 +110,8 @@ public class SignInActivity extends AppCompatActivity {
                                 if (success) {
                                     authUser = MyUser;
                                     userId = MyUser.getUserID();
+                                    // Lưu thông tin người dùng vào SharedPreferences
+                                    saveUserToSharedPreferences(authUser);
 
                                     // Xóa danh sách tài chính trước đó
                                     userFinancialList.clear();
@@ -141,6 +145,7 @@ public class SignInActivity extends AppCompatActivity {
                             });
                             // Hiển thị dialog chọn loại tài khoản hoặc điều hướng
                             showAccountTypeDialog();
+
                         }
                     } else {
                         // Đăng nhập thất bại
@@ -181,7 +186,6 @@ public class SignInActivity extends AppCompatActivity {
                 Category = new ArrayList<>();
                 // Gọi phương thức initCategory để lấy dữ liệu từ Firebase
                 initCategory(userId, isPersonal);
-
 
 
                 // Chuyển authUser sang GeneralActivity sau khi đã lưu loại tài khoản
@@ -239,8 +243,6 @@ public class SignInActivity extends AppCompatActivity {
                 categoryEditor.putString("category", categoryJson);    // Lưu mảng category
                 categoryEditor.apply();  // Lưu thay đổi
 
-
-
             }
 
             @Override
@@ -249,6 +251,16 @@ public class SignInActivity extends AppCompatActivity {
                 System.out.println("Error fetching categories: " + error.getMessage());
             }
         });
+    }
+    private void saveUserToSharedPreferences(DTBase.User authUser) {
+        Gson gson = new Gson();
+        String userJson = gson.toJson(authUser);
+
+        SharedPreferences userSharedPreferences = getSharedPreferences("MyUser", MODE_PRIVATE);
+        SharedPreferences.Editor editor = userSharedPreferences.edit();
+        editor.putString("userJson", userJson);
+        editor.apply();
+
     }
 
 

@@ -55,7 +55,6 @@ public class CalendarFragment extends Fragment {
     private int selectedMonth = -1;
     private int selectedDay = -1;
     private boolean isPersonal;
-    private String categoryJson;
     private String financialJson;
     int userId;
     private List<DTBase.Financial> userFinancialList = new ArrayList<>();
@@ -77,9 +76,6 @@ public class CalendarFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPrefs", MODE_PRIVATE);
         isPersonal = sharedPreferences.getBoolean("isPersonal", false);
 
-        // Khởi tạo SharedPreferences để lấy dữ liệu category
-        SharedPreferences categorySharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
-        categoryJson = categorySharedPreferences.getString("category", "[]"); // Mặc định là mảng rỗng nếu không có dữ liệu ([])
 
         // Khởi tạo SharedPreferences để lấy dữ liệu financial
         SharedPreferences financialSharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
@@ -296,7 +292,7 @@ public class CalendarFragment extends Fragment {
         tvShowDay.setText(displayedDate);
     }
 
-    // Hàm xử lý sự kiện chọn Edit hoặc Delete
+    // Hàm xử lý sự kiện chọn Delete
     private void ShowDelete(int userID, int financialID) {
         if (userID <= 0 || financialID <= 0) {
             Toast.makeText(getActivity(), "Invalid data. Cannot delete." + userID + " " + financialID, Toast.LENGTH_SHORT).show();

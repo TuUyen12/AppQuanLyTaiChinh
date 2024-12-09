@@ -50,16 +50,17 @@
         android:layout_marginTop="20dp"
         />
 
-    <EditText
-        android:id="@+id/et_email"
+    <TextView
+        android:id="@+id/tv_email1"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/custom_edittext"
+        android:background="@drawable/custom_textview"
         android:drawablePadding="20dp"
-        android:hint="Enter email"
-        android:inputType="textEmailAddress"
         android:paddingLeft="20dp"
+        android:text="Email"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_email" />
@@ -69,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Birthday"
-        app:layout_constraintTop_toBottomOf="@id/et_email"
+        app:layout_constraintTop_toBottomOf="@id/tv_email1"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp" />
 
