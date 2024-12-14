@@ -64,7 +64,7 @@ dependencies {
     implementation ("com.prolificinteractive:material-calendarview:1.4.3")
 
     // Material Date Pickers
-    implementation ("com.google.android.material:material:1.8.0")
+    implementation ("com.google.android.material:material:1.11.0")
 
     //JSON
     implementation ("com.google.code.gson:gson:2.8.8")

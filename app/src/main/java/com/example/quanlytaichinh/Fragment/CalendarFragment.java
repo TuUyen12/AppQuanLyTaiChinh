@@ -261,16 +261,16 @@ public class CalendarFragment extends Fragment {
                     financialCalendar.setTime(financialDate);
 
                     if (isPersonal) {
-                        // Trường hợp isPersonal = true, kiểm tra categoryID < 20
-                        if (financial1.getCategoryID() < 20
+                        // Trường hợp isPersonal = true, kiểm tra categoryID < 201
+                        if (financial1.getCategoryID() < 201
                                 && selectedCalendar.get(Calendar.YEAR) == financialCalendar.get(Calendar.YEAR)
                                 && selectedCalendar.get(Calendar.MONTH) == financialCalendar.get(Calendar.MONTH)
                                 && selectedCalendar.get(Calendar.DAY_OF_MONTH) == financialCalendar.get(Calendar.DAY_OF_MONTH)) {
                             calendarItems.add(financial1);
                         }
                     } else {
-                        // Trường hợp isPersonal = false, kiểm tra categoryID >= 20
-                        if (financial1.getCategoryID() >= 20
+                        // Trường hợp isPersonal = false, kiểm tra categoryID >= 201
+                        if (financial1.getCategoryID() >= 201
                                 && selectedCalendar.get(Calendar.YEAR) == financialCalendar.get(Calendar.YEAR)
                                 && selectedCalendar.get(Calendar.MONTH) == financialCalendar.get(Calendar.MONTH)
                                 && selectedCalendar.get(Calendar.DAY_OF_MONTH) == financialCalendar.get(Calendar.DAY_OF_MONTH)) {

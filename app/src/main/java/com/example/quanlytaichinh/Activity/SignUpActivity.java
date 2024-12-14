@@ -143,27 +143,26 @@ public class SignUpActivity extends AppCompatActivity {
         Category.add(new DTBase.Category(7, R.drawable.ic_cosmetic, "Cosmetic", "expense", userId));
         Category.add(new DTBase.Category(8, R.drawable.ic_housing_expenses, "Housing expense", "expense", userId));
 
-        Category.add(new DTBase.Category(9, R.drawable.ic_salary, "Salary", "income", userId));
-        Category.add(new DTBase.Category(10, R.drawable.ic_bonus, "Bonus", "income", userId));
-        Category.add(new DTBase.Category(11, R.drawable.ic_investment, "Investment", "income", userId));
+        Category.add(new DTBase.Category(101, R.drawable.ic_salary, "Salary", "income", userId));
+        Category.add(new DTBase.Category(102, R.drawable.ic_bonus, "Bonus", "income", userId));
+        Category.add(new DTBase.Category(103, R.drawable.ic_investment, "Investment", "income", userId));
 
-        Category.add(new DTBase.Category(20,R.drawable.ic_office_supplies, "Office Supplies", "expense", userId));
-        Category.add(new DTBase.Category(21,R.drawable.ic_travel, "Travel", "expense", userId));
-        Category.add(new DTBase.Category(22,R.drawable.ic_utilities, "Utilities", "expense", userId));
-        Category.add(new DTBase.Category(23,R.drawable.ic_marketing, "Marketing", "expense", userId));
-        Category.add(new DTBase.Category(24,R.drawable.ic_personnel, "Salary", "expense", userId));
-        Category.add(new DTBase.Category(25,R.drawable.ic_maintenance, "Maintenance", "expense", userId));
-        Category.add(new DTBase.Category(26,R.drawable.ic_project, "Project Costs", "expense", userId));
+        Category.add(new DTBase.Category(201,R.drawable.ic_office_supplies, "Office Supplies", "expense", userId));
+        Category.add(new DTBase.Category(202,R.drawable.ic_travel, "Travel", "expense", userId));
+        Category.add(new DTBase.Category(203,R.drawable.ic_utilities, "Utilities", "expense", userId));
+        Category.add(new DTBase.Category(204,R.drawable.ic_marketing, "Marketing", "expense", userId));
+        Category.add(new DTBase.Category(205,R.drawable.ic_personnel, "Salary", "expense", userId));
+        Category.add(new DTBase.Category(206,R.drawable.ic_maintenance, "Maintenance", "expense", userId));
+        Category.add(new DTBase.Category(207,R.drawable.ic_project, "Project Costs", "expense", userId));
 
-        Category.add(new DTBase.Category(27,R.drawable.ic_project_payment, "Project Payment", "income", userId));
-        Category.add(new DTBase.Category(28,R.drawable.ic_investment, "Investment", "income", userId));
-        Category.add(new DTBase.Category(29,R.drawable.ic_sales, "Sales Revenue", "income", userId));
+        Category.add(new DTBase.Category(301,R.drawable.ic_project_payment, "Project Payment", "income", userId));
+        Category.add(new DTBase.Category(302,R.drawable.ic_investment, "Investment", "income", userId));
+        Category.add(new DTBase.Category(303,R.drawable.ic_sales, "Sales Revenue", "income", userId));
 
         DTBase dtBase = new DTBase();
         dtBase.addListCategorytoFirebase(Category, userId);
 
     }
-    
 
     // Phương thức hiển thị mật khẩu
     private void setPasswordVisibilityToggle(ImageButton ib_eye, EditText editText) {

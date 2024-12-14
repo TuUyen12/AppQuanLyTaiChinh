@@ -226,16 +226,16 @@ public class HomeFragment extends Fragment {
             // Duyệt qua từng phần tử Financial
             for (DTBase.Financial financial : financialList) {
                 if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
-                    if (isPersonal && financial.getCategoryID() < 20) {
+                    if (isPersonal && financial.getCategoryID() < 201) {
                         expense += financial.getFinancialAmount();
-                    } else if (!isPersonal && financial.getCategoryID() >= 20) {
+                    } else if (!isPersonal && financial.getCategoryID() >= 201) {
                         expense += financial.getFinancialAmount();
                     }
                 }
                 else if ("income".equalsIgnoreCase(financial.getFinancialType())) {
-                    if (isPersonal && financial.getCategoryID() < 20) {
+                    if (isPersonal && financial.getCategoryID() < 201) {
                         income += financial.getFinancialAmount();
-                    } else if (!isPersonal && financial.getCategoryID() >= 20) {
+                    } else if (!isPersonal && financial.getCategoryID() >= 201) {
                         income += financial.getFinancialAmount();
                     }
                 }
@@ -386,13 +386,13 @@ public class HomeFragment extends Fragment {
         if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
             // Kiểm tra điều kiện là cá nhân hoặc không phải cá nhân
             if (isPersonal) {
-                // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
-                if (financial.getCategoryID() < 20) {
+                // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 201
+                if (financial.getCategoryID() < 201) {
                     totalExpense += financial.getFinancialAmount();
                 }
             } else {
-                // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
-                if (financial.getCategoryID() >= 20) {
+                // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 201
+                if (financial.getCategoryID() >= 201) {
                     totalExpense += financial.getFinancialAmount();
                 }
             }
@@ -405,11 +405,11 @@ public class HomeFragment extends Fragment {
         if ("income".equalsIgnoreCase(financial.getFinancialType())) {
             // Tương tự cho income
             if (isPersonal) {
-                if (financial.getCategoryID() < 20) {
+                if (financial.getCategoryID() < 201) {
                     totalIncome += financial.getFinancialAmount();
                 }
             } else {
-                if (financial.getCategoryID() >= 20) {
+                if (financial.getCategoryID() >= 201) {
                     totalIncome += financial.getFinancialAmount();
                 }
             }
@@ -549,7 +549,7 @@ public class HomeFragment extends Fragment {
                 if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
                     if (isPersonal) {
                         // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
-                        if (financial.getCategoryID() < 20) {
+                        if (financial.getCategoryID() < 201) {
                             // Cộng dồn financialAmount vào categoryID tương ứng
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
@@ -558,7 +558,7 @@ public class HomeFragment extends Fragment {
                         }
                     } else {
                         // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
-                        if (financial.getCategoryID() >= 20) {
+                        if (financial.getCategoryID() >= 201) {
                             // Cộng dồn financialAmount vào categoryID tương ứng
                             categoryAmountMap.put(
                                     financial.getCategoryID(),

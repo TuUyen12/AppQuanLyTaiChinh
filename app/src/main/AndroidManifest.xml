@@ -37,7 +37,7 @@
         <activity android:name=".Activity.ChangePasswordActivity" />
         <activity android:name=".Activity.InfoAccountActivity" />
         <activity android:name=".Activity.FeedbackActivity" />
-        <activity android:name=".Activity.TimeSettingActivity" />
+        <activity android:name=".Activity.AddCategoryActivity"/>
         <activity android:name=".Activity.GuidingInformationActivity" />
 
     </application>

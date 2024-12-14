@@ -213,16 +213,16 @@ public class SignInActivity extends AppCompatActivity {
                         if(isPersonal){
                             // Kiểm tra loại category là "expense" hay "income"
                             if ("expense".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() < 20) expense.add(category);
+                                if(category.getCategoryID() < 201) expense.add(category);
                             } else if ("income".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() < 20) income.add(category);
+                                if(category.getCategoryID() < 201) income.add(category);
                             }
                         }else{
                             if ("expense".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() >= 20) expense.add(category);
+                                if(category.getCategoryID() >= 201) expense.add(category);
                             }
                             else if ("income".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() >= 20) income.add(category);
+                                if(category.getCategoryID() >= 201) income.add(category);
                             }
                         }
                     }
