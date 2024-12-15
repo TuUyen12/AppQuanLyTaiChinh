@@ -31,7 +31,11 @@ import java.util.Random;
 
 public class DTBase {
 
+    private User user;
     private final DatabaseReference mDatabase;
+    public User getUser() {
+        return user;
+    }
 
     public DTBase() {
         // Khởi tạo tham chiếu đến Realtime Database

@@ -9,12 +9,17 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlytaichinh.DataBase.DTBase;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.example.quanlytaichinh.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -161,7 +166,41 @@ public class SignUpActivity extends AppCompatActivity {
 
         DTBase dtBase = new DTBase();
         dtBase.addListCategorytoFirebase(Category, userId);
+        InitNewCategoryID(userId);
 
+    }
+    private void InitNewCategoryID(int userId) {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        String newCategoryId = "NewCategoryID"; // ID của danh mục mới
+
+        // Chuyển userId từ int sang String
+        String userIdString = String.valueOf(userId);
+
+        // Hàm dùng chung để lưu dữ liệu vào Firebase
+        saveDataToFirebase(mDatabase, newCategoryId, userIdString, "Personal", "expense", 9);
+        saveDataToFirebase(mDatabase, newCategoryId, userIdString, "Personal", "income", 104);
+        saveDataToFirebase(mDatabase, newCategoryId, userIdString, "Business", "expense", 208);
+        saveDataToFirebase(mDatabase, newCategoryId, userIdString, "Business", "income", 304);
+    }
+
+    private void saveDataToFirebase(DatabaseReference mDatabase, String categoryId, String userId, String type, String subType, int value) {
+        mDatabase.child(categoryId)
+                .child(userId)
+                .child(type)
+                .child(subType)
+                .setValue(value)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getApplicationContext(), "Data saved successfully!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Failed to save data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     // Phương thức hiển thị mật khẩu
