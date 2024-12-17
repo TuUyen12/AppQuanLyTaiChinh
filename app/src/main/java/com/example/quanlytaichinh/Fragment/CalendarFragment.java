@@ -116,9 +116,6 @@ public class CalendarFragment extends Fragment {
             Toast.makeText(getActivity(), "No financial data available for the selected date", Toast.LENGTH_SHORT).show();
         }
 
-
-
-
         // Hiển thị ngày mặc định lên TextView
         updateDisplayedDate(selectedDay, selectedMonth + 1, selectedYear);
 
@@ -222,7 +219,7 @@ public class CalendarFragment extends Fragment {
                 int financialID = financialItem.getFinancialID();
                 int userID = financialItem.getUserID();
                 // Gọi hàm xử lý Edit/Delete với financialID
-                ShowDelete(userID, financialID);
+                ShowDelete(userID, financialID, tvShowDay.getText().toString());
 
                 return true; // Trả về true để sự kiện được xử lý và không tiếp tục với các hành động khác
             }
@@ -293,7 +290,7 @@ public class CalendarFragment extends Fragment {
     }
 
     // Hàm xử lý sự kiện chọn Delete
-    private void ShowDelete(int userID, int financialID) {
+    private void ShowDelete(int userID, int financialID, String selectedDate) {
         if (userID <= 0 || financialID <= 0) {
             Toast.makeText(getActivity(), "Invalid data. Cannot delete." + userID + " " + financialID, Toast.LENGTH_SHORT).show();
             return;
@@ -307,10 +304,8 @@ public class CalendarFragment extends Fragment {
                     // Tạo đối tượng DTBase để xóa dữ liệu
                     DTBase database = new DTBase();
                     database.deleteFinancial(userID, financialID);
-
                     // Sau khi xóa thành công, tải lại dữ liệu từ Firebase và cập nhật ListView
-                    updateListView();
-
+                    updateListView(selectedDate);
                     // Cập nhật SharedPreferences
                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -328,32 +323,43 @@ public class CalendarFragment extends Fragment {
         builder.create().show();
     }
 
-    private void updateListView() {
+    private void updateListView(String selectedDate) { // Truyền ngày được chọn vào đây
         DTBase db = new DTBase();
         // Lấy dữ liệu tài chính từ Firebase
         db.fetchFinancialData(userId, new DTBase.FinancialCallback() {
             @Override
             public void onFinancialDataFetched(List<DTBase.Financial> financialList) {
                 if (financialList != null) {
-                    userFinancialList.addAll(financialList);
+                    // Lọc dữ liệu theo ngày
+                    List<DTBase.Financial> filteredList = new ArrayList<>();
+                    for (DTBase.Financial financial : financialList) {
+                        if (financial.getFinancialDate().equals(selectedDate)) { // So sánh ngày
+                            filteredList.add(financial);
+                        }
+                    }
 
-                    // Khi dữ liệu tài chính đã tải xong, lưu vào SharedPreferences
+                    userFinancialList.clear();
+                    userFinancialList.addAll(filteredList);
+
+                    // Khi dữ liệu đã lọc xong, lưu vào SharedPreferences
                     SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyFinancials", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     Gson gson = new Gson();
                     String json = gson.toJson(userFinancialList);
                     editor.putString("financialList", json);
                     editor.apply();
+
+                    // Cập nhật ListView
                     if (adapter == null) {
-                        adapter = new CalendarAdapter(getContext(), financialList);
+                        adapter = new CalendarAdapter(getContext(), filteredList);
                         lvShowInsert.setAdapter(adapter);
                     } else {
-                        adapter.setData(financialList); // Sử dụng setData để cập nhật dữ liệu
+                        adapter.setData(filteredList); // Cập nhật adapter
                     }
                 } else {
                     Toast.makeText(getActivity(), "Error loading financial data", Toast.LENGTH_SHORT).show();
                 }
-                }
+            }
 
             @Override
             public void onError(String error) {

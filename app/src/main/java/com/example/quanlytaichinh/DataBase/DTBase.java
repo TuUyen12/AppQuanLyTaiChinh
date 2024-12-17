@@ -31,11 +31,8 @@ import java.util.Random;
 
 public class DTBase {
 
-    private User user;
+
     private final DatabaseReference mDatabase;
-    public User getUser() {
-        return user;
-    }
 
     public DTBase() {
         // Khởi tạo tham chiếu đến Realtime Database
@@ -44,6 +41,7 @@ public class DTBase {
     public static DatabaseReference getDatabaseReference() {
         return FirebaseDatabase.getInstance().getReference(); // Lấy đối tượng tham chiếu đến cơ sở dữ liệu gốc
     }
+
 
     // Thêm người dùng mới vào Firebase
     public void addNewUser(int newUserID, String username, String email) {

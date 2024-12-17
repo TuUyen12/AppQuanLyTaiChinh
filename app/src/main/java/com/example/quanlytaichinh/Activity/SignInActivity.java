@@ -238,6 +238,7 @@ public class SignInActivity extends AppCompatActivity {
                 // Lưu các chuỗi JSON vào SharedPreferences
                 SharedPreferences sharedPreferences = getSharedPreferences("MyCategory", MODE_PRIVATE);
                 SharedPreferences.Editor categoryEditor = sharedPreferences.edit();
+                categoryEditor.clear();
                 categoryEditor.putString("expense", expenseJson);  // Lưu mảng expense
                 categoryEditor.putString("income", incomeJson);    // Lưu mảng income
                 categoryEditor.putString("category", categoryJson);    // Lưu mảng category

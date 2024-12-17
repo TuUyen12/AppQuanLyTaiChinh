@@ -130,19 +130,14 @@ public class InsertFragment extends Fragment {
 
         btnSubmit = view.findViewById(R.id.btn_submit);
         Submit(btnSubmit);
+        authUser = getUserFromSharedPreferences();
+        if (authUser != null) {
+            userId = authUser.getUserID();
 
+        }
         // Nhận dữ liệu từ Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
-            authUser = (User) bundle.getSerializable("User");
-            if (authUser != null) {
-                userId = authUser.getUserID();
-
-            } else {
-            // Gán giá trị mặc định nếu authUser là null
-            userId = -1; // Hoặc giá trị hợp lệ tùy theo yêu cầu của bạn
-        }
-
             // Nhận thông tin ngày đã chọn từ CalendarFragment
             int year = bundle.getInt("selectedYear", -1); // Sử dụng -1 nếu không có dữ liệu
             int month = bundle.getInt("selectedMonth", -1); // Sử dụng -1 nếu không có dữ liệu
@@ -170,6 +165,21 @@ public class InsertFragment extends Fragment {
         int row = i / 4;
         int column = i % 4;
         return new int[]{row, column};
+    }
+    private DTBase.User getUserFromSharedPreferences() {
+        // Lấy SharedPreferences
+        SharedPreferences userSharedPreferences = getActivity().getSharedPreferences("MyUser", MODE_PRIVATE);
+
+        // Lấy chuỗi JSON từ SharedPreferences
+        String userJson = userSharedPreferences.getString("userJson", null);
+
+        // Nếu JSON không null, chuyển đổi thành đối tượng User
+        if (userJson != null) {
+            Gson gson = new Gson();
+            return gson.fromJson(userJson, DTBase.User.class);
+        }
+
+        return null; // Nếu không tìm thấy JSON, trả về null
     }
 
     private void loadCategoriesFromPreferences() {

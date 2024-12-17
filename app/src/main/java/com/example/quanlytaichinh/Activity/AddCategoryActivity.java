@@ -114,12 +114,13 @@ public class AddCategoryActivity extends AppCompatActivity {
                             // Lấy danh sách danh mục hiện tại từ SharedPreferences
                             String expenseJson = sharedPreferences.getString("expense", "[]"); // Mặc định là mảng rỗng
                             String incomeJson = sharedPreferences.getString("income", "[]"); // Mặc định là mảng rỗng
-
+                            String categoryJson = sharedPreferences.getString("category", "[]");
                             // Chuyển từ chuỗi JSON thành các mảng Category
                             Gson gson = new Gson();
                             Type categoryListType = new TypeToken<ArrayList<DTBase.Category>>() {}.getType();
                             ArrayList<DTBase.Category> expense = gson.fromJson(expenseJson, categoryListType);
                             ArrayList<DTBase.Category> income = gson.fromJson(incomeJson, categoryListType);
+                            ArrayList<DTBase.Category> newcategory = gson.fromJson(categoryJson, categoryListType);
 
                             // Kiểm tra nếu là danh mục chi tiêu hoặc thu nhập và thêm vào danh sách tương ứng
                             if (financialType.equals("expense")) {
@@ -127,12 +128,15 @@ public class AddCategoryActivity extends AppCompatActivity {
                             } else {
                                 income.add(category);
                             }
-
+                            newcategory.add(category);
                             // Chuyển lại thành chuỗi JSON và lưu vào SharedPreferences
                             String updatedExpenseJson = gson.toJson(expense);
                             String updatedIncomeJson = gson.toJson(income);
+                            String updatedCategoryJson = gson.toJson(newcategory);
                             editor.putString("expense", updatedExpenseJson);
                             editor.putString("income", updatedIncomeJson);
+                            editor.putString("category",updatedCategoryJson);
+
                             editor.apply(); // Lưu thay đổi
 
                             // Hiển thị thông báo thành công và quay lại màn hình trước
