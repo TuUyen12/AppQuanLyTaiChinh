@@ -289,6 +289,24 @@ public class AddCategoryActivity extends AppCompatActivity {
         iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon27));
         iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon28));
         iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon29));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon30));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon31));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon32));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon33));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon34));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon35));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon36));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon37));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon38));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon39));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon40));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon41));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon42));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon43));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon44));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon45));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon46));
+        iconCategoryItems.add(new IconCategoryItem(R.drawable.ic_icon47));
 
         // Tạo adapter và thiết lập cho ListView
         IconCategoryAdapter IconAdapter = new IconCategoryAdapter(this, iconCategoryItems);
