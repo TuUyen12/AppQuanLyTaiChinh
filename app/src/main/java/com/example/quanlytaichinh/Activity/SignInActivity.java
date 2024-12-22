@@ -187,72 +187,90 @@ public class SignInActivity extends AppCompatActivity {
                 // Gọi phương thức initCategory để lấy dữ liệu từ Firebase
                 initCategory(userId, isPersonal);
 
+                // Đợi dữ liệu tải xong trước khi chuyển sang GeneralActivity
+                DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference("CATEGORIES").child(String.valueOf(userId));
+                categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Khi tải dữ liệu xong
+                        Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
+                        intent.putExtra("User", authUser);
+                        startActivity(intent);
+                        Intent feedbackIntent = new Intent(SignInActivity.this, FeedbackActivity.class);
+                        feedbackIntent.putExtra("User", authUser);
+                        finish();
+                    }
 
-                // Chuyển authUser sang GeneralActivity sau khi đã lưu loại tài khoản
-                Intent intent = new Intent(SignInActivity.this, GeneralActivity.class);
-                intent.putExtra("User", authUser);
-                startActivity(intent);
-                Intent feedbackIntent = new Intent(SignInActivity.this, FeedbackActivity.class);
-                feedbackIntent.putExtra("User", authUser);
-                finish();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(SignInActivity.this, "Error loading categories: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         });
         builder.create().show();
     }
     private void initCategory(int userId, boolean isPersonal) {
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference("CATEGORIES").child(String.valueOf(userId));
+        // Tham chiếu đến node CATEGORIES trên Firebase
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance()
+                .getReference("CATEGORIES")
+                .child(String.valueOf(userId));
+
+        // Lấy dữ liệu với lắng nghe chỉ một lần
         categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Duyệt qua các danh mục và phân loại chúng vào 2 mảng expense và income
-                for (DataSnapshot categorySnapshot : snapshot.getChildren()) {
-                    DTBase.Category category = categorySnapshot.getValue(DTBase.Category.class);
-                    if (category != null) {
-                        Category.add(category);
-                        if(isPersonal){
-                            // Kiểm tra loại category là "expense" hay "income"
-                            if ("expense".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() < 201) expense.add(category);
-                            } else if ("income".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() < 201) income.add(category);
-                            }
-                        }else{
-                            if ("expense".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() >= 201) expense.add(category);
-                            }
-                            else if ("income".equals(category.getCategoryType())) {
-                                if(category.getCategoryID() >= 201) income.add(category);
+                if (snapshot.exists()) {
+                    // Duyệt qua các danh mục
+                    for (DataSnapshot categorySnapshot : snapshot.getChildren()) {
+                        DTBase.Category category = categorySnapshot.getValue(DTBase.Category.class);
+                        if (category != null) {
+                            // Thêm vào danh sách chung
+                            Category.add(category);
+
+                            // Phân loại category dựa trên loại tài khoản
+                            boolean isExpense = "expense".equals(category.getCategoryType());
+                            boolean isIncome = "income".equals(category.getCategoryType());
+                            int categoryId = category.getCategoryID();
+
+                            if (isPersonal) {
+                                if (isExpense && categoryId < 201) expense.add(category);
+                                if (isIncome && categoryId < 201) income.add(category);
+                            } else {
+                                if (isExpense && categoryId >= 201) expense.add(category);
+                                if (isIncome && categoryId >= 201) income.add(category);
                             }
                         }
                     }
+
+                    // Chuyển đổi dữ liệu sang JSON
+                    Gson gson = new Gson();
+                    String expenseJson = gson.toJson(expense);
+                    String incomeJson = gson.toJson(income);
+                    String categoryJson = gson.toJson(Category);
+
+                    // Lưu JSON vào SharedPreferences
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyCategory", MODE_PRIVATE);
+                    SharedPreferences.Editor categoryEditor = sharedPreferences.edit();
+                    categoryEditor.clear();
+                    categoryEditor.putString("expense", expenseJson);
+                    categoryEditor.putString("income", incomeJson);
+                    categoryEditor.putString("category", categoryJson);
+                    categoryEditor.apply(); // Lưu thay đổi
+                } else {
+                    Log.e("initCategory", "No categories found for userId: " + userId);
                 }
-
-                // Chuyển mảng expense và income thành chuỗi JSON
-                Gson gson = new Gson();
-                String expenseJson = gson.toJson(expense);
-                String incomeJson = gson.toJson(income);
-                String categoryJson = gson.toJson(Category);
-
-
-                // Lưu các chuỗi JSON vào SharedPreferences
-                SharedPreferences sharedPreferences = getSharedPreferences("MyCategory", MODE_PRIVATE);
-                SharedPreferences.Editor categoryEditor = sharedPreferences.edit();
-                categoryEditor.clear();
-                categoryEditor.putString("expense", expenseJson);  // Lưu mảng expense
-                categoryEditor.putString("income", incomeJson);    // Lưu mảng income
-                categoryEditor.putString("category", categoryJson);    // Lưu mảng category
-                categoryEditor.apply();  // Lưu thay đổi
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Xử lý khi có lỗi khi truy cập Firebase
-                System.out.println("Error fetching categories: " + error.getMessage());
+                // Log lỗi nếu có vấn đề với Firebase
+                Log.e("initCategory", "Error fetching categories: " + error.getMessage());
             }
         });
     }
+
     private void saveUserToSharedPreferences(DTBase.User authUser) {
         Gson gson = new Gson();
         String userJson = gson.toJson(authUser);

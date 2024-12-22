@@ -423,30 +423,6 @@ public class DTBase {
             addNewCategory(category, userId, category.getCategoryID());
         }
     }
-    public void updateFinancial(Financial financial) {
-        // Kiểm tra đối tượng financial có hợp lệ không
-        if (financial == null || financial.getUserID() <= 0 || financial.getFinancialID() <= 0) {
-            System.out.println("Invalid financial data. Update aborted.");
-            return;
-        }
-
-        // Cập nhật mục tài chính trong Firebase
-        mDatabase.child("FINANCIALS")
-                .child(String.valueOf(financial.getUserID()))
-                .child(String.valueOf(financial.getFinancialID()))
-                .setValue(financial)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Thành công
-                        System.out.println("Financial updated successfully for UserID: " + financial.getUserID());
-                    } else {
-                        // Thất bại
-                        System.err.println("Error updating financial: " + (task.getException() != null
-                                ? task.getException().getMessage()
-                                : "Unknown error"));
-                    }
-                });
-    }
 
     public void deleteFinancial(int userID, int financialID) {
         // Kiểm tra các tham số đầu vào có hợp lệ hay không
@@ -467,6 +443,27 @@ public class DTBase {
                     } else {
                         // Thất bại
                         System.err.println("Error deleting financial: " + (task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Unknown error"));
+                    }
+                });
+    }
+    public void deleteCategory(int userID, int categoryId) {
+        if(userID <= 0 || categoryId <= 0){
+            System.out.println("Invalid userID or categoryId. Deletion aborted.");
+            return;
+        }
+        mDatabase.child("CATEGORIES")
+                .child(String.valueOf(userID))
+                .child(String.valueOf(categoryId))
+                .removeValue()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Thành công
+                        System.out.println("Category deleted successfully for UserID: " + userID + ", CategoryID: " + categoryId);
+                    } else {
+                        // Thất bại
+                        System.err.println("Error deleting category: " + (task.getException() != null
                                 ? task.getException().getMessage()
                                 : "Unknown error"));
                     }
@@ -689,21 +686,26 @@ public class DTBase {
             return userID;
         }
 
-        public void setCategoryID(){
+        public void setCategoryID(int categoryID) {
             this.categoryID = categoryID;
         }
-        public void setCategoryName(){
+
+        public void setCategoryName(String categoryName) {
             this.categoryName = categoryName;
         }
-        public void setCategoryType(){
+
+        public void setCategoryType(String categoryType) {
             this.categoryType = categoryType;
         }
-        public void setCategoryIcon() {
+
+        public void setCategoryIcon(int categoryIcon) {
             this.categoryIcon = categoryIcon;
         }
-        public void setUserID() {
+
+        public void setUserID(int userID) {
             this.userID = userID;
         }
+
 
     }
 

@@ -60,13 +60,12 @@ public class ChartAdapter extends BaseAdapter {
         DTBase.Financial currentItem = itemList.get(position);
 
         ImageView ivItem = convertView.findViewById(R.id.iv_item);
-        TextView tvItem = convertView.findViewById(R.id.tv_item);
+
         TextView tvCategoryName = convertView.findViewById(R.id.tv_category_name);
         TextView tvNote = convertView.findViewById(R.id.tv_financial_name);
         TextView tvMoney = convertView.findViewById(R.id.tv_money);
+        TextView tvDate = convertView.findViewById(R.id.tv_date);
 
-        // Hiển thị categoryType trong tv_item
-        tvItem.setText(currentItem.getFinancialType());
 
         // Hiển thị title trong tv_note
         tvNote.setText(currentItem.getFinancialName());
@@ -75,6 +74,7 @@ public class ChartAdapter extends BaseAdapter {
         Locale vietnamLocale = new Locale("vi", "VN");
         String formattedAmount = NumberFormat.getCurrencyInstance(vietnamLocale).format(currentItem.getFinancialAmount());
         tvMoney.setText(formattedAmount);
+        tvDate.setText(currentItem.getFinancialDate());
 
         // Tìm kiếm Category tương ứng với categoryId của Financial
         for (DTBase.Category cat : category) {

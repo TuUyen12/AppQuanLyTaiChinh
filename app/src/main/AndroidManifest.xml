@@ -39,6 +39,7 @@
         <activity android:name=".Activity.FeedbackActivity" />
         <activity android:name=".Activity.AddCategoryActivity"/>
         <activity android:name=".Activity.GuidingInformationActivity" />
+        <activity android:name=".Activity.EditCategoryActivity" />
 
     </application>
 </manifest>

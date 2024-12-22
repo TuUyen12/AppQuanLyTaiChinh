@@ -129,23 +129,6 @@ public class ChartFragment extends Fragment {
             }
         });
 
-        lv_chart.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                // Lấy đối tượng Financial tại vị trí "position"
-                DTBase.Financial financialItem = (DTBase.Financial) adapterView.getItemAtPosition(i);
-
-                // Lấy financialID từ đối tượng Financial
-                int financialID = financialItem.getFinancialID();
-                int userID = financialItem.getUserID();
-                // Gọi hàm xử lý Edit/Delete với financialID
-
-                ShowDelete(userID, financialID);
-
-                return true; // Trả về true để sự kiện được xử lý và không tiếp tục với các hành động khác
-            }
-        });
 
         return view;
     }
@@ -401,70 +384,6 @@ public class ChartFragment extends Fragment {
         pieChart.invalidate(); // Làm mới PieChart
     }
 
-    // Hàm xử lý sự kiện chọn Delete
-    private void ShowDelete(int userID, int financialID) {
-        if (userID <= 0 || financialID <= 0) {
-            Toast.makeText(getActivity(), "Invalid data. Cannot delete." + userID + " " + financialID, Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        String message = "Do you want to delete?";
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Delete")
-                .setMessage(message)
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    // Tạo đối tượng DTBase để xóa dữ liệu
-                    DTBase database = new DTBase();
-                    database.deleteFinancial(userID, financialID);
-
-                    // Cập nhật lại ListView
-                    updateListView(); // Gọi hàm cập nhật lại ListView
-
-                    // Cập nhật SharedPreferences
-                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyFinancials", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.clear();
-                    editor.apply();
-
-                    // Thông báo sau khi xóa thành công
-                    Toast.makeText(getActivity(), "Deleted successfully!", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // Đóng dialog khi người dùng chọn "No"
-                    dialog.dismiss();
-                });
-
-        builder.create().show();
-    }
-    private void updateListView() {
-        DTBase db = new DTBase();
-        // Lấy dữ liệu tài chính từ Firebase
-        db.fetchFinancialData(userId, new DTBase.FinancialCallback() {
-            @Override
-            public void onFinancialDataFetched(List<DTBase.Financial> financialList) {
-                if (financialList != null) {
-                    userFinancialList.addAll(financialList);
-
-                    // Khi dữ liệu tài chính đã tải xong, lưu vào SharedPreferences
-                    SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyFinancials", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(userFinancialList);
-                    editor.putString("financialList", json);
-                    editor.apply();
-                    int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
-                    ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
-                    setupPieChart(pieChart, pieEntries);
-                } else {
-                    Toast.makeText(getActivity(), "Error loading financial data", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(getActivity(), "Error: " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
 }

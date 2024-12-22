@@ -14,6 +14,7 @@ import com.example.quanlytaichinh.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
 import java.util.Random;
 
 public class FeedbackActivity extends AppCompatActivity {
@@ -56,9 +57,14 @@ public class FeedbackActivity extends AppCompatActivity {
     public void addFeedback(String feedback, int userId) {
         // Tạo ID ngẫu nhiên gồm 6 ký tự
         String id = generateRandomId(6);
+        Calendar Date = Calendar.getInstance();
+        int day = Date.get(Calendar.DAY_OF_MONTH);
+        int month = Date.get(Calendar.MONTH) + 1;
+        int year = Date.get(Calendar.YEAR);
+        String date = day + "/" + month + "/" + year;
 
         // Kiểm tra xem ID đã tồn tại chưa
-        mDatabase.child("FEEDBACK").child(String.valueOf(userId)).child(id)
+        mDatabase.child("FEEDBACKS").child(String.valueOf(userId)).child(id)
                 .get().addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult().exists()) {
                         // Nếu ID đã tồn tại, tạo lại ID mới
@@ -66,7 +72,7 @@ public class FeedbackActivity extends AppCompatActivity {
                     } else {
                         // Nếu ID chưa tồn tại, thêm phản hồi
                         mDatabase.child("FEEDBACK").child(String.valueOf(userId)).child(id)
-                                .setValue(feedback)
+                                .setValue(new Feedback(feedback, date))
                                 .addOnCompleteListener(addTask -> {
                                     if (addTask.isSuccessful()) {
                                         Toast.makeText(FeedbackActivity.this, "Feedback added successfully!", Toast.LENGTH_SHORT).show();
@@ -88,7 +94,23 @@ public class FeedbackActivity extends AppCompatActivity {
         }
         return id.toString();
     }
+    // Định nghĩa lớp Feedback
+    public static class Feedback {
+        private String feedback;
+        private String date;
 
+        public Feedback(String feedback, String date) {
+            this.feedback = feedback;
+            this.date = date;
+        }
 
+        public String getFeedback() {
+            return feedback;
+        }
+
+        public String getDate() {
+            return date;
+        }
+    }
 
 }

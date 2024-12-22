@@ -20,41 +20,40 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="6"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_item"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:gravity="center_vertical"
-                android:textColor="@color/colorDefault">
-            </TextView>
+            android:orientation="horizontal">
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:layout_marginBottom="2dp">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.25"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:gravity="center_vertical"
+                    android:textColor="#3F484D">
+                </TextView>
                 <TextView
                     android:id="@+id/tv_category_name"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:textStyle="bold"
                     android:layout_marginStart="10dp"
                     android:gravity="center_vertical">
                 </TextView>
-                <TextView
-                    android:id="@+id/tv_financial_name"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:gravity="center_vertical">
-                </TextView>
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tv_financial_name"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical">
+            </TextView>
         </LinearLayout>
 
         <TextView

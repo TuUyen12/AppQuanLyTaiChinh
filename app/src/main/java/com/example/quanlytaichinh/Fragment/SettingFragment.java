@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.quanlytaichinh.Activity.AddCategoryActivity;
+import com.example.quanlytaichinh.Activity.EditCategoryActivity;
 import com.example.quanlytaichinh.Activity.FeedbackActivity;
 import com.example.quanlytaichinh.Activity.GuidingInformationActivity;
 import com.example.quanlytaichinh.DataBase.DTBase;
@@ -87,6 +88,7 @@ public class SettingFragment extends Fragment {
         settingItems.add(new SettingItem("Feedback", R.drawable.feedback_with_size));
         settingItems.add(new SettingItem("Account Type", R.drawable.exchange_with_size));
         settingItems.add(new SettingItem("Add Category", R.drawable.add1));
+        settingItems.add(new SettingItem("Edit Category", R.drawable.edit));
 
         // Tạo adapter và thiết lập cho ListView
         SettingAdapter adapter = new SettingAdapter(getContext(), settingItems);
@@ -122,6 +124,14 @@ public class SettingFragment extends Fragment {
                     Bundle bundle2 = new Bundle();
                     bundle2.putSerializable("User", authUser);
                     intent.putExtras(bundle2);
+                    startActivity(intent);
+                    break;
+                case 4:
+                    intent = new Intent(getActivity(), EditCategoryActivity.class);
+                    // Truyền authUser qua Bundle
+                    Bundle bundle3 = new Bundle();
+                    bundle3.putSerializable("User", authUser);
+                    intent.putExtras(bundle3);
                     startActivity(intent);
                     break;
                 default:

@@ -72,5 +72,5 @@ dependencies {
     //JavaMail
     implementation ("com.sun.mail:javax.mail:1.6.2")
 
-
+    implementation ("androidx.core:core:1.12.0")
 }

@@ -2,11 +2,16 @@ package com.example.quanlytaichinh.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -16,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.quanlytaichinh.DataBase.DTBase;
@@ -25,6 +31,11 @@ import com.example.quanlytaichinh.DataBase.DTBase.User;
 import com.example.quanlytaichinh.DataBase.InsertItem;
 import com.example.quanlytaichinh.R;
 import com.google.common.reflect.TypeToken;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
@@ -161,11 +172,7 @@ public class InsertFragment extends Fragment {
         return view;
     }
 
-    private int[] getRowColumn(int i){
-        int row = i / 4;
-        int column = i % 4;
-        return new int[]{row, column};
-    }
+
     private DTBase.User getUserFromSharedPreferences() {
         // Lấy SharedPreferences
         SharedPreferences userSharedPreferences = getActivity().getSharedPreferences("MyUser", MODE_PRIVATE);
@@ -182,6 +189,13 @@ public class InsertFragment extends Fragment {
         return null; // Nếu không tìm thấy JSON, trả về null
     }
 
+    // Hàm ẩn bàn phím
+    private void hideKeyboard(View view) {
+        InputMethodManager imm = ContextCompat.getSystemService(getContext(), InputMethodManager.class);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
     private void loadCategoriesFromPreferences() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyCategory", MODE_PRIVATE);
         String expenseJson = sharedPreferences.getString("expense", "[]");  // Mặc định là mảng rỗng nếu không có giá trị
@@ -260,6 +274,7 @@ public class InsertFragment extends Fragment {
                                     // Xóa dữ liệu trong EditText sau khi lưu thành công
                                     et_amount.setText("");
                                     et_note.setText("");
+                                    hideKeyboard(view);
                                 }
 
                                 @Override
@@ -286,6 +301,4 @@ public class InsertFragment extends Fragment {
         });
 
     }
-
-
 }
