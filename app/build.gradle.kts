@@ -67,7 +67,7 @@ dependencies {
     implementation ("com.google.android.material:material:1.11.0")
 
     //JSON
-    implementation ("com.google.code.gson:gson:2.8.8")
+    implementation ("com.google.code.gson:gson:2.8.9")
 
     //JavaMail
     implementation ("com.sun.mail:javax.mail:1.6.2")

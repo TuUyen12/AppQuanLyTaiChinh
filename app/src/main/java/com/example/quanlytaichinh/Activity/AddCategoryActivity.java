@@ -10,16 +10,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -39,7 +34,6 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AddCategoryActivity extends AppCompatActivity {
     Spinner spinner;
@@ -240,12 +234,11 @@ public class AddCategoryActivity extends AppCompatActivity {
     }
 
     public void initCategory(){
-        iconCategoryItems = new ArrayList<>();
+        iconCategoryItems = new ArrayList<>(); // Khởi tạo danh sách
         // Lấy danh sách các biểu tượng từ CategoryHelper
-        ArrayList<IconCategoryItem> iconCategoryItems = CategoryHelper.getIconCategoryItems(AddCategoryActivity.this);
-
-        // Tạo adapter và thiết lập cho ListView
-        IconCategoryAdapter IconAdapter = new IconCategoryAdapter(this, iconCategoryItems);
-        gridview.setAdapter(IconAdapter);
+        iconCategoryItems = CategoryHelper.getIconCategoryItems(AddCategoryActivity.this); // Sử dụng biến đã khai báo
+        // Tạo adapter và thiết lập cho GridView
+        IconCategoryAdapter iconAdapter = new IconCategoryAdapter(this, iconCategoryItems);
+        gridview.setAdapter(iconAdapter);
     }
 }

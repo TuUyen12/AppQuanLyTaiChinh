@@ -14,7 +14,6 @@ import com.example.quanlytaichinh.Fragment.SettingFragment;
 import com.google.android.material.tabs.TabLayout;
 
 public class GeneralActivity extends AppCompatActivity {
-    private boolean isHome = true; // Biến để theo dõi trạng thái của HomeFragment
     private DTBase.User authUser; // Đối tượng User để lưu thông tin người dùng
 
     @Override
