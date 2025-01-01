@@ -139,6 +139,9 @@ public class HomeFragment extends Fragment {
         spinnerDuration.setSelection(savedPosition);
         adapter.setSelectedPosition(savedPosition);
 
+        // Thiết lập PieChart
+        PieChart pieChart = view.findViewById(R.id.pieChart);
+
         // Thiết lập BarChart chi phí và thu nhập
         BarChart barChart = view.findViewById(R.id.barChart);
 
@@ -155,7 +158,7 @@ public class HomeFragment extends Fragment {
                 editor.putInt(KEY_SELECTED_POSITION, position);
                 editor.apply();
                 // Gọi hàm xử lý sự kiện với item đã chọn
-                onDurationSelected(selectedDuration, barChart);
+                onDurationSelected(selectedDuration, barChart, pieChart);
             }
 
             @Override
@@ -203,10 +206,6 @@ public class HomeFragment extends Fragment {
                 // Không có item nào được chọn
             }
         });
-
-        // Thiết lập PieChart
-        PieChart pieChart = view.findViewById(R.id.pieChart);
-        setupPieChart(pieChart, getUserPieData());
 
         return view;
     }
@@ -262,24 +261,32 @@ public class HomeFragment extends Fragment {
     }
 
     // Hàm xử lý sự kiện khi chọn item trong Spinner
-    private void onDurationSelected(String selectedDuration, BarChart barChart) {
+    private void onDurationSelected(String selectedDuration, BarChart barChart, PieChart pieChart) {
 
         switch (selectedDuration) {
             case "Today":
                 ArrayList<BarEntry> userBarEntries1 = getUserBarExpenseIncome(1);
                 setupBarChartExpenseIncome(barChart, userBarEntries1);
+                ArrayList<PieEntry> userPieEntries1 = getUserPieData(1);
+                setupPieChart(pieChart, userPieEntries1);
                 break;
             case "This Week":
                 ArrayList<BarEntry> userBarEntries2 = getUserBarExpenseIncome(2);
                 setupBarChartExpenseIncome(barChart, userBarEntries2);
+                ArrayList<PieEntry> userPieEntries2 = getUserPieData(2);
+                setupPieChart(pieChart, userPieEntries2);
                 break;
             case "This Month":
                 ArrayList<BarEntry> userBarEntries3 = getUserBarExpenseIncome(3);
                 setupBarChartExpenseIncome(barChart, userBarEntries3);
+                ArrayList<PieEntry> userPieEntries3 = getUserPieData(3);
+                setupPieChart(pieChart, userPieEntries3);
                 break;
             case "This Year":
                 ArrayList<BarEntry> userBarEntries4 = getUserBarExpenseIncome(4);
                 setupBarChartExpenseIncome(barChart, userBarEntries4);
+                ArrayList<PieEntry> userPieEntries4 = getUserPieData(4);
+                setupPieChart(pieChart, userPieEntries4);
                 break;
             default:
                 Log.d("Spinner", "No selection");
@@ -525,8 +532,7 @@ public class HomeFragment extends Fragment {
     }
 
     //Thêm dữ liệu cho PieChart
-    private ArrayList<PieEntry> getUserPieData() {
-
+    private ArrayList<PieEntry> getUserPieData(int type) {
         // Chuyển đổi categoryJson thành danh sách các đối tượng Category
         Gson gson = new Gson();
         Type categoryType = new TypeToken<List<DTBase.Category>>() {}.getType();
@@ -545,21 +551,72 @@ public class HomeFragment extends Fragment {
 
             // Duyệt qua từng phần tử Financial
             for (DTBase.Financial financial : financialList) {
-                // Kiểm tra loại financial: chỉ lấy các mục có `financialType` là "expense"
-                if ("expense".equalsIgnoreCase(financial.getFinancialType())) {
+                // Kiểm tra ngày tháng của financial
+                String financialDateString = financial.getFinancialDate();
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date financialDate = null;
+                try {
+                    financialDate = dateFormat.parse(financialDateString);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                Calendar currentDate = Calendar.getInstance();
+                boolean isValidDate = false;
+
+                switch (type) {
+                    case 1:
+                        // Lọc theo ngày hiện tại
+                        if (financialDate != null &&
+                                currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900 &&
+                                currentDate.get(Calendar.MONTH) == financialDate.getMonth() &&
+                                currentDate.get(Calendar.DAY_OF_MONTH) == financialDate.getDate()) {
+                            isValidDate = true;
+                        }
+                        break;
+                    case 2:
+                        // Lọc theo tuần hiện tại
+                        Calendar startOfWeek = (Calendar) currentDate.clone();
+                        startOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                        Calendar endOfWeek = (Calendar) currentDate.clone();
+                        endOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+
+                        if (financialDate != null &&
+                                financialDate.compareTo(startOfWeek.getTime()) >= 0 &&
+                                financialDate.compareTo(endOfWeek.getTime()) <= 0) {
+                            isValidDate = true;
+                        }
+                        break;
+                    case 3:
+                        // Lọc theo tháng hiện tại
+                        if (financialDate != null &&
+                                currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900 &&
+                                currentDate.get(Calendar.MONTH) == financialDate.getMonth()) {
+                            isValidDate = true;
+                        }
+                        break;
+                    case 4:
+                        // Lọc theo năm hiện tại
+                        if (financialDate != null &&
+                                currentDate.get(Calendar.YEAR) == financialDate.getYear() + 1900) {
+                            isValidDate = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                // Tiếp tục nếu ngày tháng hợp lệ
+                if (isValidDate && "expense".equalsIgnoreCase(financial.getFinancialType())) {
                     if (isPersonal) {
-                        // Nếu là cá nhân (isPersonal = true), chỉ thêm các financial có categoryID < 20
                         if (financial.getCategoryID() < 201) {
-                            // Cộng dồn financialAmount vào categoryID tương ứng
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
                             );
                         }
                     } else {
-                        // Nếu không phải cá nhân, chỉ thêm các financial có categoryID >= 20
                         if (financial.getCategoryID() >= 201) {
-                            // Cộng dồn financialAmount vào categoryID tương ứng
                             categoryAmountMap.put(
                                     financial.getCategoryID(),
                                     categoryAmountMap.getOrDefault(financial.getCategoryID(), 0f) + (float) financial.getFinancialAmount()
@@ -574,31 +631,21 @@ public class HomeFragment extends Fragment {
                 int categoryID = entry.getKey();
                 float amount = entry.getValue();
 
-                // Lấy tên category từ categoryList dựa trên categoryID
-                String categoryName = "Unknown"; // Mặc định là "Unknown" nếu không tìm thấy
+                String categoryName = "Unknown";
                 for (DTBase.Category category : categoryList) {
-                    Log.d("DEBUG", "Comparing categoryID: " + categoryID + " with " + category.getCategoryID());
                     if (category.getCategoryID() == categoryID) {
                         categoryName = category.getCategoryName();
-                        Log.d("DEBUG", "Matched categoryID: " + categoryID + ", Name: " + categoryName);
                         break;
                     }
                 }
 
-                // Kiểm tra nếu không tìm thấy tên category
-                if ("Unknown".equals(categoryName)) {
-                    Log.e("ERROR", "Category ID not found: " + categoryID);
-                }
-
-                // Thêm PieEntry vào danh sách
                 pieEntries.add(new PieEntry(amount, categoryName));
             }
-
         }
 
-        // Trả về danh sách PieEntry
         return pieEntries;
     }
+
 
 
     // Hàm chung để tùy chỉnh BarChart cho Expense và Income
