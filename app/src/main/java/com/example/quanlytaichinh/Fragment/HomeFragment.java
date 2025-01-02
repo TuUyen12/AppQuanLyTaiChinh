@@ -171,7 +171,13 @@ public class HomeFragment extends Fragment {
 
         // Thiết lập spinner year:
         Spinner spinnerYear = view.findViewById(R.id.spinner_year);
-        String[] yearOptions = generateYearOptions(2024, 2010);
+
+        // Lấy năm hiện tại
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+        // Tạo danh sách các năm từ năm hiện tại đến năm 2010
+        String[] yearOptions = generateYearOptions(currentYear, 2010);
+
 
         CustomSpinnerAdapter adapterYear = new CustomSpinnerAdapter(requireContext(), yearOptions);
         spinnerYear.setAdapter(adapterYear);
