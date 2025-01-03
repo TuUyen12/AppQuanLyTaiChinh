@@ -212,9 +212,8 @@ public class CalendarFragment extends Fragment {
         lvShowInsert.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // Lấy đối tượng Financial tại vị trí "position"
+                // Lấy đối tượng Financial
                 DTBase.Financial financialItem = (DTBase.Financial) adapterView.getItemAtPosition(position);
-
                 // Lấy financialID từ đối tượng Financial
                 int financialID = financialItem.getFinancialID();
                 int userID = financialItem.getUserID();

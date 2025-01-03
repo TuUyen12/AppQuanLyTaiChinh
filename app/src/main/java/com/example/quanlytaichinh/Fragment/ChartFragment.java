@@ -55,6 +55,7 @@ public class ChartFragment extends Fragment {
     private ImageButton ibYear;
     private ListView lv_chart;
     private Spinner spinner;
+    private ArrayList<PieEntry> pieEntries;
     private HorizontalScrollView horizontalScrollView;
 
     private boolean isPersonal;
@@ -90,6 +91,9 @@ public class ChartFragment extends Fragment {
             }
         }
         updateView();
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        pieEntries = getUserPieData(currentMonth, isMonthlyView);
+        setupPieChart(pieChart, pieEntries);
 
         // Month
         ibMonth.setOnClickListener(v -> {
@@ -98,7 +102,7 @@ public class ChartFragment extends Fragment {
             Toast.makeText(getContext(), "Changed to Monthly view", Toast.LENGTH_SHORT).show();
             updateView();
             int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
-            ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+            pieEntries = getUserPieData(time, isMonthlyView);
             setupPieChart(pieChart, pieEntries);
         });
         ibYear.setOnClickListener(v -> {
@@ -107,7 +111,7 @@ public class ChartFragment extends Fragment {
             Toast.makeText(getContext(), "Changed to Yearly view", Toast.LENGTH_SHORT).show();
             updateView();
             int time = isMonthlyView ? Calendar.getInstance().get(Calendar.MONTH) + 1 : Calendar.getInstance().get(Calendar.YEAR);
-            ArrayList<PieEntry> pieEntries = getUserPieData(time, isMonthlyView);
+            pieEntries = getUserPieData(time, isMonthlyView);
             setupPieChart(pieChart, pieEntries);
         });
 
@@ -128,7 +132,6 @@ public class ChartFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
 
         return view;
     }
@@ -324,7 +327,6 @@ public class ChartFragment extends Fragment {
             ibYear.setImageResource(R.drawable.year_with_size);
             setupYearSelection();
         }
-
 
     }
 
