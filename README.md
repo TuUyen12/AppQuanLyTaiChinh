@@ -14,9 +14,9 @@
 
 ## 🚀 Công nghệ sử dụng
 
-* **Ngôn ngữ:** [Java]
-* **Nền tảng:** [Android]
-* **IDE:** [Android Studio]
+* **Ngôn ngữ:** Java
+* **Nền tảng:** Android
+* **IDE:** Android Studio
 
 ## 💡 Tư duy lập trình
 
